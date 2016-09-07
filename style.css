@@ -1,0 +1,314 @@
+/* Base styles */
+
+body {
+    counter-reset: task
+}
+
+body>h1 {
+  counter-reset: sub-task;
+}
+
+body>h1::before {
+  counter-increment: task;
+  content: counter(task) ". ";
+}
+
+
+body>h2::before {
+  counter-increment: sub-task;
+  content: counter(sub-task, upper-alpha) ". ";
+}
+
+
+a strong, a:visited{
+  color: inherit;
+}
+
+hr {
+  background: none;
+  border: none;
+  border-bottom: 1px solid #d8dee9;
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+pre {
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+footer {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 4em;
+  text-align: center;
+}
+
+/* 01 Centering */
+
+header,
+main {
+  margin: 0 auto;
+  max-width: 40em;
+}
+
+/* 02 Font family */
+
+body {
+  font-family: "Helvetica", "Arial", sans-serif;
+  margin: 0 auto;
+  max-width: 40em;
+}
+
+/* 03 Spacing */
+
+body {
+  line-height: 1.4;
+  padding: 4em 1em;
+}
+
+h2 {
+  margin-top: 1em;
+  padding-top: 1em;
+}
+
+/* 04 Color and contrast */
+
+body {
+  color: #444;
+}
+
+h1,
+h2,
+strong {
+  color: #333;
+}
+
+/* 05 Balance */
+
+code,
+pre {
+  background: #eee;
+  font-family: monospace; 
+}
+
+code {
+  /* padding: 2px 4px; */
+  vertical-align: text-bottom;
+}
+
+pre {
+  padding: 1em;
+}
+
+/* 06 Primary color */
+
+/* 07 Secondary colors */
+
+body {
+  background: white;
+  color: #444;
+}
+
+code, pre {
+  /* background: #f5f7f9; */
+  background: #f0f2f0;
+  -moz-font-smoothing: grayscale;
+  -webkit-font-smoothing: initial;
+}
+
+pre {
+  border-left: 2px solid #69c;
+}
+
+body {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  -moz-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+body>h2{
+  font-weight: 500;
+  font-size: 1.0em;
+}
+
+body>h1 {
+    font-weight: 400;
+    font-size: 1.5em;
+    margin-top: 3em;
+}
+
+strong {
+  color: #444;
+  font-weight: 500;
+}
+
+header .title {
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  max-width: none;
+  text-align: center;
+  color: #433;
+  font-size: 2.5em;
+  font-weight: 300;
+  margin-bottom: 0;
+}
+header .subtitle{
+    margin: 0;
+    max-width: none;
+    text-align: center;
+    color: #433;
+    font-size: 2.0em;
+    font-weight: 200;
+}
+header .date{
+    max-width: none;
+    text-align: center;
+    color: #433;
+    font-size: 1.5em;
+    font-weight: 200;
+}
+
+/* Classes */
+
+.animate {
+    animation-duration: 1s;
+    animation-name: blink;
+}
+
+@keyframes blink {
+    from {
+        background-color: lightyellow;
+    }
+
+    to {
+        background-color: transparent;
+    }
+}
+
+html a.button {
+    border: 1px solid #d8dee9;
+    border-radius: 290486px;
+    color: #b0bfc7;
+    padding: 1em 1.5em;
+    text-align: center;
+    text-decoration: none;
+    transition: none 200ms ease-out;
+    transition-property: color, background;
+}
+
+.button:hover {
+    background: #e81c4f;
+    border-color: transparent;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.button em {
+    display: block;
+    font-size: 0.6em;
+    font-style: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.button strong {
+    color: #e81c4f;
+    transition: color 200ms ease-out;
+}
+
+.button:hover strong {
+    color: white !important;
+}
+
+.button.github strong {
+    color: #333;
+}
+
+.button.github:hover {
+    background: #333;
+}
+
+.button.facebook strong {
+    color: #3b5998;
+}
+
+.button.facebook:hover {
+    background: #3b5998;
+}
+
+.button.twitter strong {
+    color: #55acee;
+}
+
+.button.twitter:hover {
+    background: #55acee;
+}
+
+footer .button {
+    font-size: 0.8em;
+    padding: 1em 2em;
+}
+
+.buttons .button {
+    display: block;
+    margin-bottom: 1em;
+}
+
+/* Responsiveness */
+
+@media (min-width: 600px) {
+    .buttons {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        padding: 1em 0;
+    }
+
+    .buttons .button {
+        flex-grow: 1;
+        flex-shrink: 0;
+        margin-bottom: 0;
+        margin-right: 1em;
+    }
+
+    .buttons .button:last-child {
+        margin-right: 0;
+    }
+
+    .sourceCode {
+        overflow: visible;
+    }
+    pre.bash:before {
+        content: "shell";
+        display:block;
+        position: relative;
+        text-align: right;
+        margin: -1em;
+        float: right;
+        color: #888;
+        font-size: 0.8em;
+    }
+    pre.fs:before {
+        content: "fs";
+        display:block;
+        position: relative;
+        text-align: right;
+        margin: -1em;
+        float: right;
+        color: #888;
+        font-size: 0.8em;
+    }
+}
+
+#footer {
+    padding-top: 1em;
+    font-size: 70%;
+    color: gray;
+    text-align: center;
+}
+
