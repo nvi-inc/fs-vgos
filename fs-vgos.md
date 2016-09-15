@@ -4,20 +4,20 @@ subtitle: Version 0.9
 date: September 2016
 ---
 
-Set-up of RDBE from a cold start (if needed):
-================================================
+Setup of RDBE from a cold start (if needed):
+============================================
 
 Start RDBE server
 -----------------
 
 From FS PC shell prompt, login to each RDBE:
-```bash
+```tcsh
 ssh root@rdbe$X
 ```
 use `$X=a`, `b`, `c`, or `d` to log into RDBE-`$X`.
 
 Then, on each RDBE run
-```bash
+```tcsh
 rbin
 nohup ./rdbe_server 5000 6 &
 exit
@@ -84,7 +84,7 @@ at the latest).
 
 To do this from the FS console,
 press `<Control><Shift>T` to start `fmset`, or type
-```bash
+```tcsh
 fmset
 ```
 in an FS PC shell.
@@ -107,31 +107,31 @@ must have their times reset before recordings will work again.
 **After setting the time for each RDBE that needs it, repeat the
 [configure step above](#configure-rdbes) for each RDBE that was set.**
 
-Set-up of Mark 6 from a cold start (if needed):
-===============================================
+Setup Mark 6 (if needed)
+========================
 
-Start cplane and dplane
+Check cplane and dplane 
 -----------------------
 
 Login to the mark6:
-```bash
+```tcsh
 ssh root@mark6a
 ```
 Check if `cplane` and `dplane` are running:
 
-```bash
+```tcsh
 ps aux | grep plane
 ```
 
 To start them if they are not running:
 
-```bash
+```tcsh
 /etc/init.d/dplane start
 /etc/init.d/cplane start
 ```
 
-Set-up MCI server (if needed):
-==============================
+Setup MCI server (if needed)
+============================
 
 You can test whether this is needed by using the FS SNAP procedure:
 
@@ -139,11 +139,21 @@ You can test whether this is needed by using the FS SNAP procedure:
 dewar
 ```
 
-and see if you get useful output. If not, log into the MCI server node
-(need details: as oper? is a password needed? Will `ssh oper@mci`
-work?), and start the server with:
+If it is working, you will see the readouts for the 20K and 70K stages.
+If not, or if more MCI parameters are desired, use the following from a
+shell window, login to the MCI computer and run the MCI client
+```tcsh
+ssh mci
+./tcpip_client 192.168.1.51 10000
+```
+a prompt should come up
 
-```bash
+```tcsh
+mci_data?
+```
+
+
+```tcsh
 ./startmciserver
 ```
 
@@ -153,12 +163,22 @@ DRUDG experiment files
 ======================
 To create the station specific files schedule and procedure files from the master file:
 
-1. Put schedule in `/usr2/sched` on FS PC
+1.  Put schedule in `/usr2/sched` on FS PC
+
+    To download from cddis from FS oper:
+    ```tcsh
+    ftp cddis.gsfc.nasa.gov
+    Name: anonymous
+    password: <your email address>
+    cd vlbi/ivs/data/aux/2016/<schedule name>
+    get <schedule name>
+    quit
+    ```
 
 2. Run `drudg`, from FS PC shell:
-    ```bash
+    ```tcsh
     cd /usr2/sched
-    drudg <schedule_name>.skd
+    drudg <schedule name>.skd
     ```
     Now, in `drudg`, give the following commands (ignoring text after `#`)
     ```drudg
@@ -166,7 +186,7 @@ To create the station specific files schedule and procedure files from the maste
     3                        # make .snp
     12                       # make .prc
     9                        # change printer output destination
-    <schedule_name>XX.lst    # destination file, XX = station code
+    <schedule name>XX.lst    # destination file, XX = station code
                              # three more <Return>s
     5                        # print summary
     0                        # exit DRUDG
@@ -202,11 +222,13 @@ The offsets should be small and the DOT times should be the same and the
 same as the FS log timestamps. If not, run `fmset` (`<Control><Shift>T`) and verify and set times.
 
 (Don't use `s` for sync unless that RDBE had a PPS offset larger that ±2e-8.
-**If you do sync, you must re-initialize that RDBE afterwards, following [step 1.C above](#configure-rdbes)**) by cycling through RDBEs (type each band letter:
-`a`, `b`, `c`, or `d`), and be sure to exit (`<Escape>`)
+**If you do sync, you must re-initialize that RDBE afterwards,
+following [step 1.C above](#configure-rdbes)**) by cycling through RDBEs 
+(type each band letter: `a`, `b`, `c`, or `d`), and be sure to exit (`<Escape>`)
 
 Initialize pointing
 -------------------
+
 In the FS, initialize pointing setup and send antenna to test source:
 
 ```fs
@@ -218,7 +240,9 @@ casa
 Set mode and attenuators
 ------------------------
 
-In the FS, set-up experiment mode and adjust attenuators
+While waiting for the antenna to move to the test source,
+setup the experiment mode and adjust attenuators. 
+In the FS,
 
 ```fs
 proc=v15xxxXX
@@ -227,6 +251,14 @@ ifdbb
 mk6bb
 auto           # sets all attenuators three times
 ```
+
+
+Check the attenuation with 
+```fs
+raw
+```
+The level should be ~30.
+
 
 Check RDBEs
 -----------
@@ -252,14 +284,34 @@ as necessary.
 Check pointing
 --------------
 
-In the FS, Check pointing and SEFDs on test source when you have
-reached the source
-
+The antenna should now be on the test source. To check, run
 ```fs
-onsource            # result should be TRACKING
-fivept              # verify xoffset offset values are small
-onoff               # verify SEFDs for eight bands are reasonable, \~2000-3000
-azeloff=0d,0d       # zero offsets
+onsource            
+```
+The result should be `TRACKING`.
+
+Once the antenna is on source, start the pointing check with
+```fs
+fivept              
+```
+This will take a few minutes. One complete you will get an output like
+```
+#                      Az        El        Lon_offs  Lat_offs
+<time>#fivpt#xoffset   99.4469   30.8190   0.01417  -0.00806  0.00452  0.00801 1 1 01d0 virgoa
+```
+The `Lon_offs` and `Lat_off` values (ie. 3rd and 4th columns) are the offsets
+in sky coordinates of the pointing fit. The absolute value of these should be
+less that ~0.02 degrees in each coordinate.
+
+Next, measure the SEFDs on test source with
+```fs
+onoff               
+```
+verify SEFDs for eight bands are reasonable. They should be in the range ~2000-3000.
+
+Finally zero the offsets
+```fs
+azeloff=0d,0d
 ```
 
 Make test recording
@@ -267,11 +319,9 @@ Make test recording
 
 a.  This is to help with debugging, display and clear the Mark 6 message
     queue:
-
     ```fs
     mk6=msg?;
     ```
-
     If an unexplained error happens during the following procedure, please
     use this command again to get more information.
 
@@ -279,11 +329,9 @@ a.  This is to help with debugging, display and clear the Mark 6 message
 b.  Initialize module; create, mount, and open module
 
     Check status:
-
     ```fs
     mk6=mstat?all;
     ```
-
     After the two fields: return code and `cplane` status (hopefully `mstat?0:0`)
     there are 10 fields per group:
 
@@ -331,34 +379,53 @@ b.  Initialize module; create, mount, and open module
     mk6=group?;
     ```
 
-    Print out should have the group number at the end. If it is a “-”
-    something has gone wrong
+    Print out should have the group number at the end. If it is `-`,
+    something has gone wrong.
 
-c. In FS, record some test data:
+c.  In FS, record some test data:
 
     ```fs
     mk6=record=on:30:30;
     ```
 
-    verify that lights flash appropriately. You can check recording status
+    verify that lights on the mk6 flash appropriately. You can check recording status
     with:
 
     ```fs
     mk6=record?;
     ```
 
-    It should progress starting as "recording" then transitioning to "off".
+    It should progress, starting as "recording", then transitioning to "off".
 
-    If the status stays “pending”, it maybe that not all the RDBEs are
+    If the status stays `pending`, it may be that not all the RDBEs are
     sending data. You can check this by using the FS SNAP procedure
-    **mk6in**, which will show the Gb/s by interface. If one or more
-    interfaces are not showing the approximate nominal data rate (initially
-    2 Gb/s per interface), it is likely that the corresponding RDBEs need to
-    be reconfigured. Sample, correct 2 Gb/s FS log output:
-
+    ```fs
+    mk6in
     ```
-    2015.211.18:34:44.63\#popen\#mk6in/eth2 2.078 eth3 2.079 eth4 2.079 eth5
-    2.079 Gb/s
+    which will show the Gb/s by interface in the FS log. For example,
+    a rate of 2 Gb/s should should look like
+    ```
+    <time>#popen#mk6in/eth2 2.078 eth3 2.079 eth4 2.079 eth5 2.079 Gb/s
+    ```
+    If one or more interfaces are not showing the approximate nominal data rate (initially
+    2 Gb/s per interface), it is likely that the corresponding RDBEs needs to
+    be reconfigured. 
+
+
+    If needbe, you can check this direcly on the Mark6 with
+    ```tcsh 
+    ssh oper@mark6
+    /sbin/ifconfig –a     # will check all interfaces
+    ```
+    or
+    ```
+    /sbin/ifconfig eth$X  # will check a specific interface, $X=0, 1, 2, or 3
+    ```
+
+    You can also check if the disk is full with
+    ```tcsh
+    ssh oper@mark6
+    rtime
     ```
 
 d. Once recording ends, check quality:
@@ -371,31 +438,37 @@ d. Once recording ends, check quality:
     of data and 8 Gbps data rate.
 
 Start experiment
-===================
+================
 
-Start non-FS multi-cast logging:
+ Check multicast logging for all 4 bands in FS shell prompt:
+```tcsh
+mon$X  #X=a, b, c, or d
+```
+
+Start non-FS multi-cast logging
 --------------------------------
+
 
 From a FS PC shell prompt, connect to mark5-19 (Wf)
 
-```bash
+```tcsh
 ssh oper@wfmark5-19
 ```
  or monkey (Gs):
 
-```bash
+```tcsh
 ssh oper@monkey
 ```
 
 Clean-out old monitor data as appropriate, to delete all:
 
-```bash
+```tcsh
 rm -i rdbe30_mon_dat_*.log
 ```
 
 Start logging and exit:
 
-```bash
+```tcsh
 start_multicast_logging
 exit
 ```
@@ -435,7 +508,7 @@ Monitor `scan_check`
 To display `scan_check` results as they come in (and the old ones so
 far) open a new window (`Control><Shift>W`) then
 
-```bash
+```tcsh
 scan_check
 ```
 
@@ -481,15 +554,15 @@ Stop multicast logging
 
 From a FS PC shell prompt, connect to mark5-19 (Wf) or monkey (Gs):
 
-```bash
+```tcsh
 ssh oper@mark5-19  
 ```
 or 
-```bash
+```tcsh
 ssh oper@monkey
 ```
 then
-```bash
+```tcsh
 stop_multicast_logging
 exit
 ```
@@ -510,7 +583,7 @@ typing?
 
 Original (does `gator` need a `o` argument? Does it need the quotes)
 
-```bash
+```tcsh
 ssh oper@mark6a
 gator <scan name>.vdif # this takes several minutes
 dqa -d <scan name>.vdif # this takes several minutes
@@ -527,7 +600,7 @@ oper@evlbi1.haystack.mit.edu:/data-st12/vgos/
 
 Suggested alternate instructions:
 
-```bash
+```tcsh
 ssh oper@mark6a
 gather /mnt/disks/1/\/data/<file name>.vdif -o <file name>.vdif
 dqa -d <file name>
@@ -564,7 +637,7 @@ log=station
 
 In FS Shell prompt
 
-```bash
+```tcsh
 cd /usr2/log
 ftp cddisin.gsfc.nasa.gov
 user Supply your user cddisin user name

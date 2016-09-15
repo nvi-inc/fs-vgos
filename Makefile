@@ -1,14 +1,14 @@
-all: pdf html docx slides
+all: pdf html docx
 .PHONY: all
 
 %.docx: %.md
 	pandoc -S -o $@ $<
 	
-pdf/%.pdf: %.md header.tex
+%.pdf: %.md header.tex
 	pandoc -H header.tex\
 		--latex-engine-opt '-shell-escape'\
-		%--filter pandoc-minted\
 		-V subparagraph -V verbatim-in-note --number-sections $< -o $@
+	#--filter pandoc-minted
 	# pandoc -V subparagraph $< -o $@
 	# pandoc  -H header.tex -V subparagraph -V classoption=twocolumn $< -o $@
 
