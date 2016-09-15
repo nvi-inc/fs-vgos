@@ -280,29 +280,6 @@ footer .button {
         margin-right: 0;
     }
 
-    .sourceCode {
-        overflow: visible;
-    }
-    pre.bash:before {
-        content: "shell";
-        display:block;
-        position: relative;
-        text-align: right;
-        margin: -1em;
-        float: right;
-        color: #888;
-        font-size: 0.8em;
-    }
-    pre.fs:before {
-        content: "fs";
-        display:block;
-        position: relative;
-        text-align: right;
-        margin: -1em;
-        float: right;
-        color: #888;
-        font-size: 0.8em;
-    }
 }
 
 #footer {
@@ -312,3 +289,26 @@ footer .button {
     text-align: center;
 }
 
+.sourceCode {
+    overflow: visible;
+}
+pre.bash:before {
+    content: "shell";
+    display:block;
+    position: relative;
+    text-align: right;
+    margin: -1em;
+    float: right;
+    color: #888;
+    font-size: 0.8em;
+}
+pre.fs:before {
+    content: "fs";
+    display:block;
+    position: relative;
+    text-align: right;
+    margin: -1em;
+    float: right;
+    color: #888;
+    font-size: 0.8em;
+}

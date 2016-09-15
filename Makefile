@@ -5,7 +5,10 @@ docx/%.docx: %.md
 	pandoc -S -o $@ $<
 	
 pdf/%.pdf: %.md header.tex
-	pandoc -H header.tex -V subparagraph -V verbatim-in-note --number-sections $< -o $@
+	pandoc -H header.tex\
+		--latex-engine-opt '-shell-escape'\
+		--filter pandoc-minted\
+		-V subparagraph -V verbatim-in-note --number-sections $< -o $@
 	# pandoc -V subparagraph $< -o $@
 	# pandoc  -H header.tex -V subparagraph -V classoption=twocolumn $< -o $@
 

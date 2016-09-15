@@ -106,7 +106,7 @@ FS time.
 
 Be sure to exit with `<Escape>`. 
 
-Note if an experiment spans the end of a December 31 or a June 30 and any RDBE gets its time
+>Note: if an experiment spans the end of a December 31 or a June 30 and any RDBE gets its time
 reset after that but before the end of the experiment, **all** the RDBEs
 must have their times reset before recordings will work again.
 
@@ -155,28 +155,28 @@ work?), and start the server with:
 
 And log out of the MCI server node
 
-DRUDG experiment files:
-=======================
+DRUDG experiment files
+======================
 To create the station specific files schedule and procedure files from the master file:
 
-Put schedule in `/usr2/sched` on FS PC
+1. Put schedule in `/usr2/sched` on FS PC
 
-Run `drudg`, from FS PC shell:
-```bash
-cd /usr2/sched
-drudg <schedule_name>.skd
-```
-Now, in `drudg`, give the following commands (ignoring text after `#`)
-```drudg
-XX                       # select your station code XX (gs = GGAO)
-3                        # make .snp
-12                       # make .prc
-9                        # change printer output destination
-<schedule_name>XX.lst    # destination file, XX = station code
-                         # three more <Return>s
-5                        # print summary
-0                        # exit DRUDG
-```
+2. Run `drudg`, from FS PC shell:
+    ```bash
+    cd /usr2/sched
+    drudg <schedule_name>.skd
+    ```
+    Now, in `drudg`, give the following commands (ignoring text after `#`)
+    ```drudg
+    XX                       # select your station code XX (gs = GGAO)
+    3                        # make .snp
+    12                       # make .prc
+    9                        # change printer output destination
+    <schedule_name>XX.lst    # destination file, XX = station code
+                             # three more <Return>s
+    5                        # print summary
+    0                        # exit DRUDG
+    ```
 
 Experiment set-up
 =================
@@ -193,11 +193,10 @@ log=v15xxxXX
 Check RDBE time and offsets
 ---------------------------
 
-**Note:** if this is the first experiment since December 31 and June 30, and
+>**Note:** if this is the first experiment since December 31 and June 30, and
 the RDBEs have not had their time set since that epoch, reset the time each of
 RDBE according [the sync RDBEs step 1.D above](#sync-rdbes). This must be done even if the
 time appears to be correct in the step below.
-
 
 In the FS, check RDBE time and offsets:
 
@@ -298,13 +297,13 @@ b.  Initialize module; create, mount, and open module
     group:slot:eMSN:#disks found:#disks nominal:free space:total space:status1:status2:type
     ```
 
-    It may be easier to read if individual groups are queried, for group 1:
+    It may be easier to read if individual groups are queried; eg. for group 1:
 
     ```fs
     mk6=mstat?1;
     ```
 
-    If the module has already been initialized (status1 is `initialized`?),
+    If the module has already been initialized (status1 is `initialized`),
     and the data is no longer needed, erase it:
 
     ```fs
@@ -515,53 +514,53 @@ NEEDS FEEDBACK. Which method should be used and what corrections are
 needed? Where can more wildcards and other shortcuts be used to reduce
 typing?
 
-Original (does **gator** need a **–o** argument? Does it need the
-quotes)
+Original (does `gator` need a `o` argument? Does it need the quotes)
 
 ```bash
 ssh oper@mark6a
 gator <scan name>.vdif # this takes several minutes
 dqa -d <scan name>.vdif # this takes several minutes
-
 scp <scan name>_0.vdif oper@evlbi1.haystack.mit.edu:/data-st12/vgos/
 scp <scan name>_1.vdif oper@evlbi1.haystack.mit.edu:/data-st12/vgos/
 scp <scan name>_2.vdif
 oper@evlbi1.haystack.mit.edu:/data-st12/vgos/
-
 scp <scan name>_3.vdif
 oper@evlbi1.haystack.mit.edu:/data-st12/vgos/
 ```
 
-**(example *<scan name>*: 104-1535)**
+(example `<scan name>`: `104-1535`)
+
 
 Suggested alternate instructions:
 
-**ssh oper@mark6a**
+```bash
+ssh oper@mark6a
+gather /mnt/disks/1/\/data/<file name>.vdif -o <file name>.vdif
+dqa -d <file name>
+scp <file name>\_0.vdif oper@evlbi1.haystack.mit.edu:/data-st12/vgos/
+```
 
-**gather /mnt/disks/1/\*/data/*<file name>*.vdif -o *<file
-name>*.vdif**
+(example `<file name>`: `v15132_gs_132-1432`)
 
-**dqa -d *<file name>***
-
-**scp *<file name>*\_0.vdif
-oper@evlbi1.haystack.mit.edu:/data-st12/vgos/**
-
-(example ***<file name>**:* **v15132\_gs\_132-1432**)
-
-If the directory is full, the **dqa** command will fail. The user has to
-log into the mark6 and remove old .vdif files that have been gathered
+If the directory is full, the `dqa` command will fail. The user has to
+log into the mark6 and remove old `.vdif` files that have been gathered
 and sent already. The transfers will take roughly 20 min per 10 seconds
 of data.
 
-E. Remove the module for shipping:
+Remove the module for shipping:
+-------------------------------
 
-**mk6=group=close:*<slots>*;**
+```fs
+mk6=group=close:<slots>;
+mk6=group=unmount:<slots>;
+```
+to check the modules are unmounted
+```
+mk6=mstat?all; 
+```
 
-**mk6=group=unmount:*<slots>*;**
-
-**mk6=mstat?all;** to check the modules are unmounted
-
-F Transfer log file
+Transfer log file
+-----------------
 
 In FS, close experiment log:
 
