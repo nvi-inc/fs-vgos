@@ -22,9 +22,13 @@
     \par}
 \makeatother
 
+\newlength\mylen
+\setlength\mylen{\dimexpr\oddsidemargin+1in+\hoffset\relax}
+
 \renewcommand\thesection{\arabic{section}}
 \renewcommand\thesubsection{\Alph{subsection}}
 \titleformat{\section}[block]{\large\bfseries}{\thesection.}{0.5em}{}[]
+%\titleformat{\section}{\normalfont\large\bfseries}{\llap{\hspace*{-\mylen}\hfill\thesection. }}{0em}{}
 \titlespacing{\section}{0pt}{2em}{0em}
 \titlespacing{\subsection}{0pt}{1em}{0em}
 \titleformat{\subsection}[block]{\bfseries}{\thesubsection.}{0.5em}{}
@@ -40,8 +44,8 @@
 %  cat make-code-footnot'
 
 % \definecolor{shadecolor}{RGB}{240,245,240}
-% \renewenvironment{Shaded}{\setlength{\leftmargin}{1cm}\begin{snugshade}\footnotesize}{\end{snugshade}}
-% \VerbatimEnvironment
-% \renewenvironment{verbatim}{\begin{Shaded}\begin{Highlighting}}{\end{Highlighting}\end{Shaded}}
-% \renewenvironment{verbatim}{\VerbatimEnvironment\begin{Shaded}\begin{Verbatim}}{\end{Verbatim}\end{Shaded}}
-\usepackage[cache=false]{minted}
+\renewenvironment{Shaded}{\setlength{\leftmargin}{1cm}\begin{snugshade}\footnotesize}{\end{snugshade}}
+\VerbatimEnvironment
+\renewenvironment{verbatim}{\begin{Shaded}\begin{Highlighting}}{\end{Highlighting}\end{Shaded}}
+\renewenvironment{verbatim}{\VerbatimEnvironment\begin{Shaded}\begin{Verbatim}}{\end{Verbatim}\end{Shaded}}
+%\usepackage[cache=false]{minted}
