@@ -22,12 +22,16 @@
     \par}
 \makeatother
 
+\newlength\mylen
+\setlength\mylen{\dimexpr\oddsidemargin+1in+\hoffset\relax}
+
 \renewcommand\thesection{\arabic{section}}
 \renewcommand\thesubsection{\Alph{subsection}}
 \titleformat{\section}[block]{\large\bfseries}{\thesection.}{0.5em}{}[]
+%\titleformat{\section}{\normalfont\large\bfseries}{\llap{\hspace*{-\mylen}\hfill\thesection. }}{0em}{}
 \titlespacing{\section}{0pt}{2em}{0em}
 \titlespacing{\subsection}{0pt}{1em}{0em}
-\titleformat{\subsection}[block]{\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsection}[block]{\bfseries}{\thesubsection.}{1em}{}
 
 \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
 %
@@ -40,4 +44,4 @@
 %  cat make-code-footnot'
 
 \renewenvironment{Shaded}{\begin{snugshade}\footnotesize}{\end{snugshade}}
-\definecolor{shadecolor}{RGB}{236,236,236}
+\definecolor{shadecolor}{RGB}{246, 246, 252}

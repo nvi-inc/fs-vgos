@@ -10,75 +10,69 @@ Set-up of RDBE from a cold start (if needed):
 Start RDBE server
 -----------------
 
-From FS PC shell prompt:
-
+From FS PC shell prompt, login to each RDBE:
 ```bash
 ssh root@rdbe$X
 ```
+use `$X=a`, `b`, `c`, or `d` to log into RDBE-`$X`.
 
-
-for `$X=a`, `b`, `c`, or `d` logs into RDBE-`$X`.
-Then, on the RDBE:
-
+Then, on each RDBE run
 ```bash
 rbin
 nohup ./rdbe_server 5000 6 &
 exit
 ```
-
 Repeat this for each RDBE that has been restarted. You can verify when all the RDBEs
 have started from the FS with:
-
 ```fs
 rdbe_status
 ```
-
 There will be error for each RDBE that is not ready. When all RDBEs
-respond with a status value, proceed to step B.
+respond with a status value `0x0e01`, proceed to step the next step.
 
 Load Firmware
 -------------
 
-From the FS, load the firmware for RDBE `$X` with
-```fs
-rdbe_fpga$X
-```
-again, for `$X=a`, `b`, `c`, or `d`.
-To load all RDBEs, use:
+To load the firmware on all RDBEs, use the FS command:
 ```fs
 rdbe_fpga
 ```
 
+If you want to load the firmware individually for RDBE-`$X`,
+you can use the FS command
+```fs
+rdbe_fpga$X
+```
+again, where `$X=a`, `b`, `c`, or `d` as necessary.
+
 There will be an error for each RDBE, since it will not respond right
 away and will time-out. You verify when this is finished from the FS
-with
+with again using
 ```fs
 rdbe_status
 ```
-as above. This time you are looking for third digit from the right in
-the status message to be '1':
 
-`0xz1zz` where the `z` positions are any other hex digits
+This time, the RDBEs should respond with status `0x0f01`
 
 When all status values reach the correct value, proceed to step C.
 
 Configure RDBEs
 ---------------
-From the FS, initialize the configuration for RDBE `$X`:
 
-```fs
-rdbe_init$X
-```
-
-You should get a "success" message.
-
-To load all RDBEs, use:
+To initialize the configuration on all RDBEs, use the FS command:
 
 ```fs
 rdbe_init
 ```
-
 You should get four "success" messages.
+
+
+If you need initialize an RDBE individually use, the FS command
+```fs
+rdbe_init$X
+```
+You should get four "success" messages.
+
 
 Sync RDBEs
 ----------
@@ -97,18 +91,19 @@ in an FS PC shell.
 
 You can select the RDBE to set by letter: `a`, `b`, `c`, or `d`. 
 
-With that RDBE’s time being displayed, type `s` to sync it (and `y` to confirm), then
+With that RDBE's time being displayed, type `s` to sync it (and `y` to confirm), then
 type `.` (dot) to set the time to FS time. 
 
-If the resulting displayed time is off by up to a few seconds, use `+` and/or `-` to increment
-and/or decrement the RDBE by a second at time until it agrees with the
-FS time. 
+If the resulting displayed time is off by up to a few seconds, use `+`
+and/or `-` to increment and/or decrement the RDBE by a second at time
+until it agrees with the FS time.
 
-Be sure to exit with `<Escape>`. 
+Be sure to exit with `<Escape>`.
 
-Note if an experiment spans the end of a December 31 or a June 30 and any RDBE gets its time
-reset after that but before the end of the experiment, **all** the RDBEs
-must have their times reset before recordings will work again.
+>Note if an experiment spans the end of a December 31 or a June 30 and
+any RDBE gets its time reset after that but before the end of the
+experiment, **all** the RDBEs must have their times reset before
+recordings will work again.
 
 **After setting the time for each RDBE that needs it, repeat the
 [configure step above](#configure-rdbes) for each RDBE that was set.**
