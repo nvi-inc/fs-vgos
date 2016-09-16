@@ -1,9 +1,11 @@
+\usepackage[utf8]{inputenc}
 \usepackage[compact]{titlesec}
 \renewcommand{\paragraph}[1]{\oldparagraph{#1} }
 \usepackage[T1]{fontenc} 
 \usepackage[top=0.5in, bottom=1in, left=1.3in, right=1.3in]{geometry}
 \setlength{\columnsep}{1cm}
-\usepackage{tgpagella}
+% \usepackage{tgpagella}
+\usepackage{tgtermes}
 \usepackage{microtype}
 \usepackage{framed}
 % \ifxetex\usepackage{framed}
@@ -49,3 +51,27 @@
 %\renewenvironment{verbatim}{\begin{Shaded}\begin{Highlighting}}{\end{Highlighting}\end{Shaded}}
 %\renewenvironment{verbatim}{\VerbatimEnvironment\begin{Shaded}\begin{Verbatim}}{\end{Verbatim}\end{Shaded}}
 %\usepackage[cache=false]{minted}
+\usepackage{xcolor}
+
+\lstset{
+    basicstyle=\ttfamily,
+    keywordstyle=\color[rgb]{0.13,0.29,0.53}\bfseries,
+    stringstyle=\color[rgb]{0.31,0.60,0.02},
+    commentstyle=\color[rgb]{0.56,0.35,0.01}\itshape,
+    numberstyle=\footnotesize,
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color[RGB]{234,240,234},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=true,
+    breakautoindent=true,
+    escapeinside={\%*}{*)},
+    xleftmargin=1em,
+    linewidth=0.9\textwidth,
+    basewidth=0.5em,
+}

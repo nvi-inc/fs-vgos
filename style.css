@@ -14,7 +14,11 @@ body>h1 {
     font-weight: 400;
     font-size: 1.5em;
     margin-top: 2em;
+    border-top: 1px solid #7c8390;
+    padding-top: 1em;
+    display: block;
 }
+
 
 body>h1::before {
   counter-increment: task;
@@ -49,6 +53,14 @@ hr {
   border-bottom: 1px solid #d8dee9;
 }
 
+blockquote {
+    border: 2px solid #7c8390;
+    padding: 0.75em;
+    margin: 2em;
+    border-radius: 8px;
+}
+
+
 img {
   height: auto;
   max-width: 100%;
@@ -76,7 +88,7 @@ header, main {
 body {
   font-family: "Helvetica", "Arial", sans-serif;
   margin: 0 auto;
-  max-width: 48em;
+  max-width: 40em;
   line-height: 1.35;
   padding: 4em 1em;
   background: white;
@@ -93,7 +105,8 @@ ol {
 
 code, pre {
   font-family: monospace;
-  background: #f6f8f6;
+  color: #333;
+  background: #eaedea;
   -moz-font-smoothing: grayscale;
   -webkit-font-smoothing: initial;
 }
@@ -101,8 +114,9 @@ code, pre {
 
 pre {
   /* border-left: 1px solid #69c; */
-  border: 1px solid #aaa;
+  /* border: 1px solid #aaa; */
   padding: 1em;
+  margin: 1em;
 }
 
 p {
@@ -270,7 +284,7 @@ footer .button {
 .sourceCode {
     overflow: visible;
 }
-pre.bash:before {
+pre.tcsh:before {
     content: "shell";
     display:block;
     position: relative;

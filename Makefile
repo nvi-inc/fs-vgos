@@ -6,6 +6,9 @@ all: pdf html docx
 	
 %.pdf: %.md header.tex
 	pandoc -H header.tex\
+		--toc \
+		--latex-engine=xelatex\
+		--listings \
 		--latex-engine-opt '-shell-escape'\
 		-V subparagraph -V verbatim-in-note --number-sections $< -o $@
 	#--filter pandoc-minted
@@ -13,7 +16,7 @@ all: pdf html docx
 	# pandoc  -H header.tex -V subparagraph -V classoption=twocolumn $< -o $@
 
 %.html: %.md
-	pandoc --toc -t html5 -S -c style.css $< -o $@
+	pandoc --toc --highlight-style monochrome -t html5 -S -c style.css $< -o $@
 	
 %.html: %.md style.css
 	pandoc --self-contained -S -c style.css --mathjax -t slidy -o $@ $<
