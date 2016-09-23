@@ -11,6 +11,7 @@ all: pdf html docx
 		--listings \
 		--latex-engine-opt '-shell-escape'\
 		-V subparagraph -V verbatim-in-note --number-sections $< -o $@
+	#	-V fontsize=12pt\
 	#--filter pandoc-minted
 	# pandoc -V subparagraph $< -o $@
 	# pandoc  -H header.tex -V subparagraph -V classoption=twocolumn $< -o $@
