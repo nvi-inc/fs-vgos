@@ -3,16 +3,31 @@ title: VGOS Operations Notes
 date: September 2016
 ---
 
+>EH: Need FS start section: boot PC, auto-logged in (or manually) as
+"oper", veryify NTP sync'd, then start FS (anything else?). For KPGO
+and GGAO, if antenna must be started, do it after NTP has sync'd on FS
+computer. (what about other devices dependent on NTP?)
+
 Setup of RDBE from a cold start
 ===============================
 
 Start RDBE server
 -----------------
+
+>EH: This section will change completely with the new server. It will
+boot to a state where the configuration step has finished. There will
+be a different status code to indicate success. It will just be
+necessary to sync after boot.
+
 From FS PC shell prompt, login to each RDBE:
 
 ```tcsh
 ssh root@rdbe<id>
 ```
+
+>EH: All devices should be set-up so the operator can ssh into then
+without providing a pasword. That isn't part of the procedure, but
+maybe should be noted somewhere (other issues?).
 
 use `<id>=a`, `b`, `c`, or `d` to log into RDBE-`<id>`.
 
@@ -33,6 +48,11 @@ rdbe_status
 
 There will be error for each RDBE that is not ready. When all RDBEs
 respond with a status value `0x0e01`, proceed to step the next step.
+
+
+>EH: _an_ error
+
+>EH: there is an extra _step_ in there.
 
 Load Firmware
 -------------
@@ -81,6 +101,7 @@ rdbe_init<id>
 
 You should a "success" message.
 
+>EH: should _get_ a
 
 Sync RDBEs
 ----------
@@ -116,16 +137,29 @@ Be sure to exit with `<Escape>`.
 
 >*Dave: is this right? Is it possible to sync before configure?*
 
+>EH: No, it needs config first. Unfortunately with this server, a sync
+invalidates the config, so it has to be done again. With the new
+server/FS, a sync won't cause this problem.
+
+
 >If an experiment spans the end of a December 31 or a June 30 and any
 RDBE gets its time reset after that but before the end of the experiment,
 **all** the RDBEs must have their times reset before recordings will work
 again.
 
+>EH: This will change with the new server/FS, which will display the
+VDIF epoch and FMSET will let you set it per RDBE. In that case, if
+one RDBE is rebooted after an epoch change (December 31 or June 30),
+that RDBE can be moved back to the previous epoch.
 
 Start Mark 6 servers
 ====================
 
+>EH: Eventually, the Mark6 should start the servers on boot.
+
 >*Dave: is there an FS command to check if these are running?*
+
+>EH: Suggest mk6=dts_id?; or antother suitable Mark6 command.
 
 The programs `cplane` and `dplane` need
 to be running on the Mark 6. These should startup after boot. 
@@ -146,8 +180,12 @@ To start them if they are not running:
 
 Note: dplane must be started before cplane.
 
+>EH: If I knew that I forgot it. :)
+
 Setup MCI server 
 ================
+
+>EH: different for each station
 
 You can test whether this is needed by using the FS SNAP procedure:
 
@@ -169,6 +207,11 @@ mci_data?
 
 >*Dave: Is this the correct command?*
 
+>EH: have to check with Katie and/or try it. Does this refer to the
+previous or following?
+
+>EH: To start the server:
+
 ```tcsh
 ./startmciserver
 ```
@@ -181,11 +224,17 @@ To create the station specific schedule and procedure files from the master file
 
 1.  Put schedule in `/usr2/sched` on FS PC
 
+
+>EH: I would like to transition to use /usr2/exper for .skd/.vex files.
+
     To download from cddis, in an FS terimal:
     ```tcsh
     cd /usr2/sched
     ftp cddis.gsfc.nasa.gov
     ```
+
+>EH: we should do this with wget or ncftp to minimize the typing
+
     then, in the ftp prompt
     ```
     Name: anonymous
@@ -196,8 +245,9 @@ To create the station specific schedule and procedure files from the master file
     ```
     >*Dave: Should this be `get <schedule>.skd?`*
 
-    Here `<schedule>` should be something like "v16033".
+>EH: Yes.
 
+    Here `<schedule>` should be something like "v16033".
 
 
 2. Run `drudg`, from FS PC shell:
@@ -239,6 +289,9 @@ the RDBEs have not had their time set since that epoch, reset the time each of
 RDBE according the [Sync RDBEs] step above. This must be done even if the
 time appears to be correct in the step below.
 
+
+>EH: with the new server, this above can be skipped, but more changes below:
+
 In the FS, check RDBE time and offsets:
 
 ```fs
@@ -249,10 +302,19 @@ The offsets should be small and the DOT times should be the same and the
 same as the FS log timestamps. If not, run `fmset` (`<Control><Shift>T`) and verify and set times
 by cycling through RDBEs (type each band letter: `a`, `b`, `c`, or `d`), and be sure to exit (`<Escape>`)
 
+>EH: new server/FS: The offsets should be small and the DOT times
+should be the same and the same as the FS log timestamps and all the
+RDBEs should have the same VDIF epoch. If not, run `fmset`
+(`<Control><Shift>T`) and verify and set times and VDIF epochs (set
+all RDBEs to the displayed "nominal" epoch) by cycling through RDBEs
+(type each band letter: `a`, `b`, `c`, or `d`), and be sure to exit
+(`<Escape>`).
+
 >Don't use `s` for sync unless that RDBE had a PPS offset larger that ±2e-8.
 **If you do sync, you must re-initialize that RDBE afterwards,
 following the [Configure RDBEs] step above.**
 
+>EH:the above '** ... **' comment does not apply to the new server/FS.
 
 Initialize pointing
 -------------------
@@ -265,6 +327,19 @@ casa
 ```
 
 >*Dave: which sources are good and when?*
+
+>EH: The most reliable for these small antennas are :
+
+Source        Approximate L.S.T. of transit
+--------  
+Taurus A            05:30
+Virgo A             12:30
+Cygnus A            20:00
+Cas A               23:30
+
+L.A.S.T time is displayed in the antenna monitor window at GGAO and
+KPGO. Cas A is always up at GGAO and Westford. The northern hemisphere
+does have some advantages.
 
 Set mode and attenuators
 ------------------------
@@ -281,6 +356,8 @@ mk6bb
 auto                    # sets all attenuators three times
 ```
 
+>EH: with the new server/FS, the command no longer applies, the command
+is still "auto", but it only sets it once.
 
 Check the attenuation with 
 ```fs
@@ -288,6 +365,8 @@ raw
 ```
 The levels should all be ~32.
 
+>EH: with the server/FS, the target is ~20. RFI may vary and affect the
+level, 40 is definitely too high. (?Less than 5 is too low? need to check)
 
 Check RDBEs
 -----------
@@ -295,12 +374,20 @@ Check RDBEs
 Run RDBE Monitor program (`<Control><Shift>6` or `monit6` in a shell),
 and check for each RDBE that:
 
+>EH: Actually, it is started (and positioned) automatically at FS start
+
 1.  DOT ticking and correct time
+
+>EH: new server/FS: and VDIF for all RDBEs agree
 
 2.  DOT2GPS value small (a few µseconds) and stable (varies by 0.1
     µseconds or less)
 
 3.  RMS value close to 32
+
+>EH: (note the display switches between IF0 and IF1 every second)
+
+>EH: new server/FS: RMS value close to 20
 
 4.  Tsys IF0 and IF1 about 50-100, may be jumping a bit
 
@@ -309,6 +396,9 @@ and check for each RDBE that:
 
 Leave the window open for later monitoring but position out of the way
 as necessary.
+
+>EH: can delete the above sentence. it is automatically positioned
+correctly (I hope)
 
 Check pointing
 --------------
@@ -336,6 +426,12 @@ The `Lon_offs` and `Lat_off` values (ie. the 3rd and 4th columns) are the offset
 in sky coordinates of the pointing fit. The absolute value of these should be
 less that ~0.02 degrees in each coordinate.
 
+>EH: Lon_offs is actuall xEl_off and Lat_offs is El_off. There should
+be '1 1' flags before the detector name (01d0). Is it possible to
+release the margins and/or use a smaller font so this doesn't line
+wrap in .pdf (and Word?) version. This comment is also for any other
+places there is a line wwrap, like for mk6in.
+
 Next, measure the SEFDs on test source
 ```fs
 onoff               
@@ -349,6 +445,9 @@ azeloff=0d,0d
 
 Make test recording
 -------------------
+
+>EH: I haven't done this for a long time, so I hope you have or will
+verify this in complete detail. :)
 
 a.  This is to help with debugging, display and clear the Mark 6 message
     queue:
@@ -455,6 +554,11 @@ c.  In FS, record some test data:
     ```
     <time>#popen#mk6in/eth2 2.078 eth3 2.079 eth4 2.079 eth5 2.079 Gb/s
     ```
+
+>EH: Possible to fix the line wrap? Actually GGAO was showing an extra
+interface, "eth1" due to using a different Mark6. I have fixed that
+now so it agrees with above.
+
     If one or more interfaces are not showing the approximate nominal data rate (initially
     2 Gb/s per interface), it is likely that the corresponding RDBEs needs to
     be reconfigured. 
@@ -465,6 +569,9 @@ c.  In FS, record some test data:
     ```tcsh 
     ssh oper@mark6
     ```
+
+>EH: oper@ is redundant, or is it better to be explicit?
+
     Then, to check all interfaces, running
     ```
     /sbin/ifconfig –a     
@@ -475,6 +582,10 @@ c.  In FS, record some test data:
     ```
     where `<X>`=`0`, `1`, `2`, or `3`
     
+
+>EH: actually `2`, `3`, '4', or `5`, but this is deprecated since mk6in
+is available, maybe remove this whole "if need be" section?
+
     You can also check if the disk is full with
 
     ```tcsh
@@ -482,8 +593,12 @@ c.  In FS, record some test data:
     rtime
     ```
 
+>EH: (oper@ is redundant) I think for the above your have to run the
+client and use rtime?;
+
     >*Dave: can you check this in the FS? `disk_pos`?*
 
+>EH: In FS: mk6=rtime?
 
 d. Once recording ends, check quality:
 
@@ -494,6 +609,8 @@ d. Once recording ends, check quality:
     Results should show vdif, the time when recording was started, 30 seconds of data, 30 GB
     of data and 8 Gbps data rate.
 
+>EH: data rate will eventually go to 16 and 32 Gbps.
+
 Start experiment
 ================
 Check multicast logging for all 4 bands in FS shell prompt:
@@ -501,8 +618,17 @@ Check multicast logging for all 4 bands in FS shell prompt:
 mon<id>  #<id>=a, b, c, or d
 ```
 
+>EH: This is not really to check mult-cast logging, but the data being
+sent in multicast messages. MONIT6 demonstrates that multicast is
+working. I am hoping we can get rid of use the "monitor" program. To
+be discussed with Chet
+
 Start non-FS multi-cast logging
 --------------------------------
+
+>EH: With influx logging of data, maybe we can get rid of this logging,
+once influxDB is installed.
+
 From a FS PC shell prompt,
 connect to mark5-19 (Wf)
 
@@ -513,6 +639,7 @@ or monkey (Gs):
 ```tcsh
 ssh oper@monkey
 ```
+>EH: (oper@ is redundant) Kokee: is is backend-pc so: ssh backend-pc
 
 Start logging and exit:
 
@@ -530,6 +657,13 @@ ssh –Y oper@monkey
 cd bin
 python vgos-msg-gui.py
 ```
+
+>EH: Different hosts at different sites of course (oper@ is redundant),
+but at KPGO I fixed this so .fvwm2rc short-cut Control-Shift-G starts
+it, all the sites should get that. Jason will eventually move
+vgos-msg-gui.py to the FS machines so we can have better
+functionality. Maybe the placement of the window should be controlled
+locally by .Xresources.
 
 At this point a GUI window should pop up. Enter the session name,
 station code (lower case) and select the type of message from the drop
@@ -555,6 +689,8 @@ In FS PC Shell, look at the list file `<schedule><stn id>.lst` created
 in the DRUDG step (eg. `v16033gs.lst`). Find the first observation and note line
 number 'nnn' after scan name at start of line.
 
+>EH: In a FS PC Shell _(xterm window)_, ...
+
 Now, in the FS, start schedule:
 
 ```fs
@@ -565,6 +701,10 @@ schedule=<session><stn id>,#<nnn>
 
 >*Dave: can you just do `schedule=<session><stn id>`? (does it find the next scan after 5 min like AuScope?)*
 
+>EH: Well yes, if are more than five minutes from the start of
+schedule, but sometimes we start in the middle. Is it better to have
+one description that works for all situations or two different
+ones, what do you think? Your choice.
 
 Send "Start" message
 --------------------
@@ -593,6 +733,11 @@ seconds and GBs of data (typically 30+), and 8 Gbps data rate. Be aware
 Position and size window for convenient viewing, new output will follow
 any changed size. You can stop this with `<Control>C`
 
+>EH: I set up KPGO so that .fvwm2rc short-cut Control-Shift-K opens a
+window with this output. The placement and size of the window is
+controlled by .Xresources. I think everyone should get this if they
+don't already have it.
+
 Check RDBE Monitor
 ------------------
 
@@ -600,16 +745,25 @@ Check the display for reasonable values:
 
 1.  DOT ticking and correct time
 
+>EH: new server/FS: and VDIF for all RDBEs agree
+
 2.  DOT2GPS value small (a few µseconds) and stable (varies by 0.1
     µseconds or less)
 
 3.  RMS value close to 32
+
+>EH: (note the display switches between IF0 and IF1 every second)
+
+>EH: new server/FS: RMS value close to 20
 
 4.  Tsys IF0 and IF1 about 50-100, but may lower at Wf due to
     preliminary cal value, may be jumping a bit
 
 5.  Phase-cal amplitude about 10-100, phase stable to within a few
     degrees
+
+>EH: (note the display switches between IF0 and IF1 every second)
+
 
 Post experiment
 ===============
@@ -645,6 +799,8 @@ stop_multicast_logging
 exit
 ```
 
+>EH: Kokee: backend-pc and (oper@ is redundant for all) 
+
 Check pointing and SEFDs
 ------------------------
 
@@ -656,6 +812,9 @@ antenna to an appropriate source (eg. casa)
 proc=point
 casa
 ```
+
+>EH: Note "initp" is needed before "casa" _if_ the FS has been restarted since
+pre-experiment checks
 
 Wait until the antenna is on source. You can
 either watch the log or check with 
@@ -692,6 +851,10 @@ Send test scan data files
 
 In a terminal, log in to the Mark 6
 
+>EH: this is the part I know the least about and I suspect it different
+for different stations, maybe using something besides "gather", have
+tried it at GGAO?
+
 ```tcsh
 ssh oper@mark6a
 gather /mnt/disks/<slot>/*/data/<filename>.vdif –o <filename>.vdif
@@ -699,6 +862,8 @@ dqa –d <filename>.vdif
 scp <filename>_*.vdif oper@evlbi1.haystack.mit.edu:/data-st12/vgos/
 ```
 
+>EH: (oper@'s are redundant) Maybe put into a script, or something, to
+minimize typing? It is definitely too much typing
 
 Remove the module for shipping
 -------------------------------
@@ -736,11 +901,19 @@ put <session><stn id>.log      # eg 'v16033gs'
 quit
 ```
 
+>EH: it seems like the typing here can be greatly reduced with ncftp
+bookmarks or maybe there is something even better, I thought I had
+already set that up for Katie, but couldn't find it. All the sites
+should have that.
+
 And to Haystack:
 
 ```
 scp <session><stn id>.log oper@evlbi1.haystack.mit.edu:/data-st12/vgos/logs
 ```
+
+>EH:(oper@ is redundant) Ditto on the comments above about reducing
+typing for cddisin
 
 Appendix
 ========
@@ -761,10 +934,14 @@ I suggest you call it `hYYDDD.skd`. The "h" is to avoid confusing it with *real*
 
 6. End DRUDG
 
+>EH: or reselect schedule (option #8)
+
 7. Restart DRUDG with the new file to make the normal output
 
 Module conditioning
 -------------------
+
+>EH: no experience myself, have you tested?
 
 1.  Load modules and enter da-client
 
@@ -772,6 +949,8 @@ Module conditioning
 ssh oper@mark6a
 da-client
 ```
+
+>EH:(oper@ is redundant) 
 
 2.  In da-client, initialize the modules with the same `mod_init` command
     used for experiment set up:
