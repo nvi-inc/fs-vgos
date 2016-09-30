@@ -304,3 +304,12 @@ pre.fs:before {
     color: #888;
     font-size: 0.8em;
 }
+
+table {
+    margin: auto;
+    border-spacing: 2em 0.4em;
+    border-collapse: separate;
+}
+.wide {
+    font-size: 0.8em;
+}

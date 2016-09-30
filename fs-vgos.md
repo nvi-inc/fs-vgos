@@ -3,8 +3,28 @@ title: VGOS Operations Notes
 date: September 2016
 ---
 
+Setup Field System PC
+=====================
+
+TODO: this section
+
+- Start FS computer (if needed)
+- Login as user `oper`
+
+Check NTP
+```tcsh
+ntpq -p
+```
+
+```
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+*192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
++192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
+```
+
 >EH: Need FS start section: boot PC, auto-logged in (or manually) as
-"oper", veryify NTP sync'd, then start FS (anything else?). For KPGO
+"oper", verify NTP sync'd, then start FS (anything else?). For KPGO
 and GGAO, if antenna must be started, do it after NTP has sync'd on FS
 computer. (what about other devices dependent on NTP?)
 
@@ -26,7 +46,7 @@ ssh root@rdbe<id>
 ```
 
 >EH: All devices should be set-up so the operator can ssh into then
-without providing a pasword. That isn't part of the procedure, but
+without providing a password. That isn't part of the procedure, but
 maybe should be noted somewhere (other issues?).
 
 use `<id>=a`, `b`, `c`, or `d` to log into RDBE-`<id>`.
@@ -46,13 +66,8 @@ have started from the FS with:
 rdbe_status
 ```
 
-There will be error for each RDBE that is not ready. When all RDBEs
-respond with a status value `0x0e01`, proceed to step the next step.
-
-
->EH: _an_ error
-
->EH: there is an extra _step_ in there.
+There will be an error for each RDBE that is not ready. When all RDBEs
+respond with a status value `0x0e01`, proceed to the next step.
 
 Load Firmware
 -------------
@@ -99,18 +114,15 @@ If you need initialize an RDBE individually use, the FS command
 rdbe_init<id>
 ```
 
-You should a "success" message.
-
->EH: should _get_ a
+You should get a "success" message.
 
 Sync RDBEs
 ----------
 It is **necessary** to sync and set the time with `fmset` for an RDBE
-**every time** it is restarted. 
+**every time** it is restarted.
 
-(And also as soon as feasible after a
-December 31 and a June 30, before the first experiment after those dates
-at the latest.) 
+(And also as soon as feasible after a December 31 and a June 30, before the
+first experiment after those dates at the latest.)
 
 To do this from the FS console,
 press `<Control><Shift>T` to start `fmset`, or type
@@ -121,51 +133,44 @@ fmset
 
 in an FS PC shell.
 
-You can select the RDBE to set by letter: `a`, `b`, `c`, or `d`. 
+You can select the RDBE to set by letter: `a`, `b`, `c`, or `d`.
 
-With that RDBE's time being displayed, type `s` to sync it (and `y` to confirm), then
-type `.` (dot) to set the time to FS time. 
+With that RDBE's time being displayed, type `s` to sync it (and `y` to
+confirm), then type `.` (dot) to set the time to FS time.
 
-If the resulting displayed time is off by up to a few seconds, use `+` and/or `-` to increment
-and/or decrement the RDBE by a second at time until it agrees with the
-FS time. 
+If the resulting displayed time is off by up to a few seconds, use `+` and/or
+`-` to increment and/or decrement the RDBE by a second at time until it agrees
+with the FS time.
 
-Be sure to exit with `<Escape>`. 
+Be sure to exit with `<Escape>`.
 
 **After setting the time for each RDBE that needs it, repeat the
 [Configure RDBEs] step above for each RDBE that was set.**
-
->*Dave: is this right? Is it possible to sync before configure?*
-
->EH: No, it needs config first. Unfortunately with this server, a sync
-invalidates the config, so it has to be done again. With the new
-server/FS, a sync won't cause this problem.
-
 
 >If an experiment spans the end of a December 31 or a June 30 and any
 RDBE gets its time reset after that but before the end of the experiment,
 **all** the RDBEs must have their times reset before recordings will work
 again.
 
->EH: This will change with the new server/FS, which will display the
-VDIF epoch and FMSET will let you set it per RDBE. In that case, if
-one RDBE is rebooted after an epoch change (December 31 or June 30),
-that RDBE can be moved back to the previous epoch.
 
-Start Mark 6 servers
-====================
+Check Mark 6 connection
+=======================
 
->EH: Eventually, the Mark6 should start the servers on boot.
+From the Field System, check the Mark 6 connection
 
->*Dave: is there an FS command to check if these are running?*
+```fs
+mk6=dts_id
+```
+You should receive a sensible response similar to
+```
+!dts_id?0:Mark6-4605:1.0.24-1:1.2;
+```
 
->EH: Suggest mk6=dts_id?; or antother suitable Mark6 command.
+If you receive an error check that the Mark 6 servers
+are running. The programs `cplane` and `dplane` need
+to be running on the Mark 6. These should startup after boot.
 
-The programs `cplane` and `dplane` need
-to be running on the Mark 6. These should startup after boot. 
-
-If you have a problem check if they are running 
-with
+To check check if they are running perform
 ```tcsh
 ssh root@mark6a
 ps aux | grep plane
@@ -180,12 +185,14 @@ To start them if they are not running:
 
 Note: dplane must be started before cplane.
 
->EH: If I knew that I forgot it. :)
 
 Setup MCI server 
 ================
 
->EH: different for each station
+This will vary by station.
+
+GGAO
+----
 
 You can test whether this is needed by using the FS SNAP procedure:
 
@@ -205,8 +212,6 @@ a prompt should come up. To display all the MCI data use the command
 mci_data?
 ```
 
->*Dave: Is this the correct command?*
-
 >EH: have to check with Katie and/or try it. Does this refer to the
 previous or following?
 
@@ -225,7 +230,7 @@ To create the station specific schedule and procedure files from the master file
 1.  Put schedule in `/usr2/sched` on FS PC
 
 
->EH: I would like to transition to use /usr2/exper for .skd/.vex files.
+    >EH: I would like to transition to use /usr2/exper for .skd/.vex files.
 
     To download from cddis, in an FS terimal:
     ```tcsh
@@ -233,19 +238,20 @@ To create the station specific schedule and procedure files from the master file
     ftp cddis.gsfc.nasa.gov
     ```
 
->EH: we should do this with wget or ncftp to minimize the typing
+    >EH: we should do this with wget or ncftp to minimize the typing
+
+    ```
+    wget ftp://cddis.gsfc.nasa.gov/vlbi/ivsdata/aux/2016/<schedule>/<schedule>.skd
+    ```
 
     then, in the ftp prompt
     ```
     Name: anonymous
     password: <your email address>
-    cd vlbi/ivs/data/aux/2016/<schedule> 
-    get <schedule>
+    cd vlbi/ivs/data/aux/2016/<schedule>
+    get <schedule>.skd
     quit
     ```
-    >*Dave: Should this be `get <schedule>.skd?`*
-
->EH: Yes.
 
     Here `<schedule>` should be something like "v16033".
 
@@ -330,16 +336,16 @@ casa
 
 >EH: The most reliable for these small antennas are :
 
-Source        Approximate L.S.T. of transit
---------  
-Taurus A            05:30
-Virgo A             12:30
-Cygnus A            20:00
-Cas A               23:30
+      Source   Approximate L.S.T. of transit
+   ---------  ------------------------------
+    Taurus A                           05:30
+     Virgo A                           12:30
+    Cygnus A                           20:00
+       Cas A                           23:30
 
-L.A.S.T time is displayed in the antenna monitor window at GGAO and
-KPGO. Cas A is always up at GGAO and Westford. The northern hemisphere
-does have some advantages.
+Local apparent sidereal time (L.A.S.T) is displayed in the antenna monitor
+window at GGAO and KPGO. Cas A is always up at GGAO and Westford. The northern
+hemisphere does have some advantages.
 
 Set mode and attenuators
 ------------------------
@@ -418,11 +424,11 @@ fivept
 ```
 
 This will take a few minutes. One complete you will get an output like
-```
-#                      Az        El        Lon_offs  Lat_offs
+```bash
+#                      Az        El        xEl_offs  El_offs
 <time>#fivpt#xoffset   99.4469   30.8190   0.01417  -0.00806  0.00452  0.00801 1 1 01d0 virgoa
 ```
-The `Lon_offs` and `Lat_off` values (ie. the 3rd and 4th columns) are the offsets
+The `xEl_offs` and `El_off` values (ie. the 3rd and 4th columns) are the offsets
 in sky coordinates of the pointing fit. The absolute value of these should be
 less that ~0.02 degrees in each coordinate.
 
@@ -555,9 +561,9 @@ c.  In FS, record some test data:
     <time>#popen#mk6in/eth2 2.078 eth3 2.079 eth4 2.079 eth5 2.079 Gb/s
     ```
 
->EH: Possible to fix the line wrap? Actually GGAO was showing an extra
-interface, "eth1" due to using a different Mark6. I have fixed that
-now so it agrees with above.
+    >EH: Possible to fix the line wrap? Actually GGAO was showing an extra
+    interface, "eth1" due to using a different Mark6. I have fixed that
+    now so it agrees with above.
 
     If one or more interfaces are not showing the approximate nominal data rate (initially
     2 Gb/s per interface), it is likely that the corresponding RDBEs needs to
@@ -570,7 +576,7 @@ now so it agrees with above.
     ssh oper@mark6
     ```
 
->EH: oper@ is redundant, or is it better to be explicit?
+    >EH: oper@ is redundant, or is it better to be explicit?
 
     Then, to check all interfaces, running
     ```
@@ -583,8 +589,8 @@ now so it agrees with above.
     where `<X>`=`0`, `1`, `2`, or `3`
     
 
->EH: actually `2`, `3`, '4', or `5`, but this is deprecated since mk6in
-is available, maybe remove this whole "if need be" section?
+    >EH: actually `2`, `3`, '4', or `5`, but this is deprecated since mk6in
+    is available, maybe remove this whole "if need be" section?
 
     You can also check if the disk is full with
 
@@ -593,12 +599,12 @@ is available, maybe remove this whole "if need be" section?
     rtime
     ```
 
->EH: (oper@ is redundant) I think for the above your have to run the
-client and use rtime?;
+    >EH: (oper@ is redundant) I think for the above your have to run the
+    client and use rtime?;
 
     >*Dave: can you check this in the FS? `disk_pos`?*
 
->EH: In FS: mk6=rtime?
+    >EH: In FS: mk6=rtime?
 
 d. Once recording ends, check quality:
 
@@ -609,7 +615,7 @@ d. Once recording ends, check quality:
     Results should show vdif, the time when recording was started, 30 seconds of data, 30 GB
     of data and 8 Gbps data rate.
 
->EH: data rate will eventually go to 16 and 32 Gbps.
+    >EH: data rate will eventually go to 16 and 32 Gbps.
 
 Start experiment
 ================
@@ -760,9 +766,7 @@ Check the display for reasonable values:
     preliminary cal value, may be jumping a bit
 
 5.  Phase-cal amplitude about 10-100, phase stable to within a few
-    degrees
-
->EH: (note the display switches between IF0 and IF1 every second)
+    degrees (note the display switches between IF0 and IF1 every second)
 
 
 Post experiment
@@ -810,6 +814,7 @@ antenna to an appropriate source (eg. casa)
 
 ```fs
 proc=point
+initp
 casa
 ```
 
@@ -835,7 +840,7 @@ onoff
 ```
 and verify SEFDs for eight bands are reasonable, ~2000-3000.
 
-Finally, zero offsets
+Finally, zero the offsets
 ```fs
 azeloff=0d,0d
 ```
@@ -901,6 +906,16 @@ put <session><stn id>.log      # eg 'v16033gs'
 quit
 ```
 
+
+In the `.netrc` file:
+```
+machine cddisin.gsfc.nasa.gov login <username> password <password>
+```
+
+```tcsh
+curl -T <logname> -u 
+```
+
 >EH: it seems like the typing here can be greatly reduced with ncftp
 bookmarks or maybe there is something even better, I thought I had
 already set that up for Katie, but couldn't find it. All the sites
@@ -909,7 +924,7 @@ should have that.
 And to Haystack:
 
 ```
-scp <session><stn id>.log oper@evlbi1.haystack.mit.edu:/data-st12/vgos/logs
+scp <session><stn id>.log evlbi1.haystack.mit.edu:/data-st12/vgos/logs
 ```
 
 >EH:(oper@ is redundant) Ditto on the comments above about reducing
