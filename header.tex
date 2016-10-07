@@ -1,11 +1,15 @@
-\usepackage[utf8]{inputenc}
+\usepackage{fontspec}
 \usepackage[compact]{titlesec}
 \renewcommand{\paragraph}[1]{\oldparagraph{#1} }
-\usepackage[T1]{fontenc} 
 \usepackage[top=0.5in, bottom=1in, left=1.3in, right=1.3in]{geometry}
 \setlength{\columnsep}{1cm}
 % \usepackage{tgpagella}
-\usepackage{tgtermes}
+% \usepackage{tgtermes}
+% \setmainfont[Mapping=tex-text]{TeX Gyre Heros}
+\setmainfont[Mapping=tex-text]{Roboto}
+% \setmainfont[Mapping=tex-text]{TeX Gyre Pagella}
+% \setmainfont[Mapping=tex-text]{TeX Gyre Termes}
+\setmonofont{Roboto Mono}
 \usepackage{microtype}
 \usepackage{framed}
 % \ifxetex\usepackage{framed}
@@ -61,17 +65,17 @@
     numberstyle=\footnotesize,
     stepnumber=1,
     numbersep=5pt,
-    backgroundcolor=\color[RGB]{234,240,234},
+    backgroundcolor=\color[RGB]{234,237,234},
     showspaces=false,
     showstringspaces=false,
     showtabs=false,
-    tabsize=2,
+    tabsize=4,
     captionpos=b,
     breaklines=false,
-    breakatwhitespace=true,
+    breakatwhitespace=false,
     breakautoindent=true,
     escapeinside={\%*}{*)},
-    xleftmargin=1em,
-    linewidth=0.9\textwidth,
-    basewidth=0.5em,
+    xleftmargin=0em,
+    linewidth=\textwidth,
+    basewidth=0.58em,
 }

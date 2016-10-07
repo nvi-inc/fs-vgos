@@ -4,15 +4,23 @@ all: pdf html docx
 %.docx: %.md
 	pandoc -S -o $@ $<
 	
+# %.pdf: %.md
+# 	pandoc \
+# 		--toc \
+# 		--number-sections \
+# 		-t context\
+# 		$< -o $@
+
 %.pdf: %.md header.tex
 	pandoc -H header.tex\
 		--toc \
-		--latex-engine=xelatex\
 		--listings \
+		--latex-engine=xelatex\
 		--latex-engine-opt '-shell-escape'\
 		-V subparagraph -V verbatim-in-note --number-sections $< -o $@
 	#	-V fontsize=12pt\
 	#--filter pandoc-minted
+		# --latex-engine=lualatex\
 	# pandoc -V subparagraph $< -o $@
 	# pandoc  -H header.tex -V subparagraph -V classoption=twocolumn $< -o $@
 
