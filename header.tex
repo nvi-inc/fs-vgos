@@ -1,7 +1,7 @@
 \usepackage{fontspec}
 \usepackage[compact]{titlesec}
 \renewcommand{\paragraph}[1]{\oldparagraph{#1} }
-\usepackage[top=0.5in, bottom=1in, left=1.3in, right=1.3in]{geometry}
+\usepackage[top=0.5in, bottom=1in, left=1.0in, right=1.0in]{geometry}
 \setlength{\columnsep}{1cm}
 % \usepackage{tgpagella}
 % \usepackage{tgtermes}
@@ -11,7 +11,13 @@
 % \setmainfont[Mapping=tex-text]{TeX Gyre Termes}
 \setmonofont{Roboto Mono}
 \usepackage{microtype}
-\usepackage{framed}
+
+\usepackage{tcolorbox}
+% \usepackage{framed}
+\let\oldquote=\quote
+\let\endoldquote=\endquote
+
+\renewenvironment{quote}{\begin{tcolorbox}\begin{oldquote}}{\end{oldquote}\end{tcolorbox}}
 % \ifxetex\usepackage{framed}
 %   % \usepackage{xeCJK}
 %   % \setCJKmainfont{WenQuanYi Zen Hei}

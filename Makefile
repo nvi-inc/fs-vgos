@@ -16,6 +16,7 @@ all: pdf html docx
 		--toc \
 		--listings \
 		--latex-engine=xelatex\
+		-V fontsize=12pt\
 		--latex-engine-opt '-shell-escape'\
 		-V subparagraph -V verbatim-in-note --number-sections $< -o $@
 	#	-V fontsize=12pt\

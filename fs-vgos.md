@@ -1,12 +1,12 @@
 ---
 title: VGOS Operations Notes
-date: September 2016
+date: October 2016
 ---
 
 Setup Field System PC
 =====================
 
-TODO: this section
+> TODO: this section
 
 -   Start FS computer (if needed)
 -   Login as user `oper`
