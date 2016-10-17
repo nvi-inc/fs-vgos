@@ -1,31 +1,35 @@
----
-title: VGOS Operations Notes
-date: October 2016
----
+% VGOS Operations Notes
+%
+% October 2016
 
 Setup Field System PC
 =====================
 
-> TODO: this section
+> This section is not complete
+
+> **EH:** Need FS start section: boot PC, auto-logged in (or manually) as
+> "oper", verify NTP sync'd, then start FS (anything else?). For KPGO
+> and GGAO, if antenna must be started, do it after NTP has sync'd on FS
+> computer. (what about other devices dependent on NTP?)
 
 -   Start FS computer (if needed)
 -   Login as user `oper`
 
-Check NTP
+-   Check NTP: 
 
 ```tcsh
 ntpq -p
 ```
+
+The output is of the form
 
          remote           refid      st t when poll reach   delay   offset  jitter
     ==============================================================================
     *192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
     +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
 
-> EH: Need FS start section: boot PC, auto-logged in (or manually) as
-> "oper", verify NTP sync'd, then start FS (anything else?). For KPGO
-> and GGAO, if antenna must be started, do it after NTP has sync'd on FS
-> computer. (what about other devices dependent on NTP?)
+
+The offset should be small.
 
 Setup of RDBE from a cold start
 ===============================
@@ -39,7 +43,7 @@ From FS PC shell prompt, login to each RDBE:
 ssh root@rdbe<id>
 ```
 
-> EH: All devices should be set-up so the operator can ssh into then
+> **EH:** All devices should be set-up so the operator can ssh into then
 > without providing a password. That isn't part of the procedure, but
 > maybe should be noted somewhere (other issues?).
 
@@ -162,10 +166,7 @@ You should receive a sensible response similar to
 
     !dts_id?0:Mark6-4605:1.0.24-1:1.2;
 
-
->**TODO:**  What are the values? What will an error look like?
-
-If you receive an error check that the Mark 6 servers are running. The
+If you receive an error, check that the Mark 6 servers are running. The
 programs `cplane` and `dplane` need to be running on the Mark 6. These
 should startup after boot.
 
@@ -176,7 +177,7 @@ ssh root@mark6a
 ps aux | grep plane
 ```
 
-To start them if they are not running:
+If they are not, start them
 
 ```tcsh
 /etc/init.d/dplane start
@@ -188,7 +189,7 @@ Note: dplane must be started before cplane.
 Setup MCI server
 ================
 
->**TODO:** this is GGAO specific. Will vary by station.
+>This is specific to GGAO.
 
 You can test whether this is needed by using the FS SNAP procedure:
 
@@ -209,10 +210,8 @@ a prompt should come up. To display all the MCI data use the command
 
     mci_data?
 
-> EH: have to check with Katie and/or try it. Does this refer to the
-> previous or following?
 
-To start the server:
+If the server is not running, start it with
 
 ```tcsh
 ./startmciserver
@@ -249,10 +248,10 @@ log=<schedule><stn id> # eg v16033gs
 Check RDBE time and offsets
 ---------------------------
 
-> **Note:** if this is the first experiment since December 31 and June
-> 30, and the RDBEs have not had their time set since that epoch, reset
-> the time each of RDBE according the [Sync RDBEs] step above. This must
-> be done even if the time appears to be correct in the step below.
+**Note:** if this is the first experiment since December 31 and June
+30, and the RDBEs have not had their time set since that epoch, reset
+the time each of RDBE according the [Sync RDBEs] step above. This must
+be done even if the time appears to be correct in the step below.
 
 In the FS, check RDBE time and offsets:
 
@@ -265,9 +264,9 @@ same as the FS log timestamps. If not, run `fmset` (`<Control><Shift>T`)
 and verify and set times by cycling through RDBEs (type each band
 letter: `a`, `b`, `c`, or `d`), and be sure to exit (`<Escape>`)
 
-> Don't use `s` for sync unless that RDBE had a PPS offset larger that
-> ±2e-8. **If you do sync, you must re-initialize that RDBE afterwards,
-> following the [Configure RDBEs] step above.**
+Don't use `s` for sync unless that RDBE had a PPS offset larger that
+±2e-8. **If you do sync, you must re-initialize that RDBE afterwards,
+following the [Configure RDBEs] step above.**
 
 Initialize pointing
 -------------------
@@ -291,9 +290,8 @@ The following sources are most reliable for these small antennas are:
        Cas A 23:30
 
 Local apparent sidereal time (L.A.S.T) is displayed in the antenna
-monitor window at GGAO and KPGO. Cas A is always up at GGAO and Westford
-but if it's close to the horizon, another source may be more
-appropriate.
+monitor window (monan) at GGAO and KPGO. Cas A is always up at GGAO and
+Westford but another source may be more appropriate at times.
 
 Set mode and attenuators
 ------------------------
@@ -309,7 +307,7 @@ mk6bb
 auto                    # sets all attenuators three times
 ```
 
-> EH: with the new server/FS, the command no longer applies, the command
+> **EH:** with the new server/FS, the command no longer applies, the command
 > is still "auto", but it only sets it once.
 
 Check the attenuation with
@@ -318,10 +316,7 @@ Check the attenuation with
 raw
 ```
 
-The levels should all be ~32, and should not be higher than 40 or less
-than 10(?).
-
-> TODO: check
+The levels should all be ~32, and should not be higher than 40 or less than around 10.
 
 Check RDBEs
 -----------
@@ -347,8 +342,10 @@ Leave the window open for later monitoring.
 Check multicast for all 4 bands in FS shell prompt:
 
 ```tcsh
-mon<id>  #<id>=a, b, c, or d
+mon<id>
 ```
+
+where `<id>=a, b, c, or d` (eg. `mona` etc.)
 
 Check pointing
 --------------
@@ -398,9 +395,7 @@ azeloff=0d,0d
 Make test recording
 -------------------
 
-> TODO: verify this
-
-a.  This is to help with debugging, display and clear the Mark 6 message
+1.  This is to help with debugging, display and clear the Mark 6 message
     queue:
 
     ```fs
@@ -410,7 +405,7 @@ a.  This is to help with debugging, display and clear the Mark 6 message
     If an unexplained error happens during the following procedure,
     please use this command again to get more information.
 
-b.  Initialize module; create, mount, and open module
+2.  Initialize module; create, mount, and open module
 
     Check status:
 
@@ -487,7 +482,7 @@ b.  Initialize module; create, mount, and open module
     Print out should have the group number at the end. If it is `-`,
     something has gone wrong.
 
-c.  In FS, record some test data:
+3.  In FS, record some test data:
 
     ```fs
     mk6=record=on:30:30;
@@ -515,10 +510,6 @@ c.  In FS, record some test data:
 
         #popen#mk6in/eth2 2.078 eth3 2.079 eth4 2.079 eth5 2.079 Gb/s
 
-    > EH: Possible to fix the line wrap? Actually GGAO was showing an
-    > extra interface, "eth1" due to using a different Mark6. I have
-    > fixed that now so it agrees with above.
-
     If one or more interfaces are not showing the approximate nominal
     data rate (initially 2 Gb/s per interface), it is likely that the
     corresponding RDBEs needs to be reconfigured.
@@ -529,7 +520,7 @@ c.  In FS, record some test data:
     mk6=rtime?
     ```
 
-d.  Once recording ends, check quality:
+4.  Once recording ends, check quality:
 
     ```fs
     mk6=scan_check?;
@@ -538,13 +529,12 @@ d.  Once recording ends, check quality:
     Results should show vdif, the time when recording was started, 30
     seconds of data, 30 GB of data and 8 Gbps data rate.
 
-    > EH: data rate will eventually go to 16 and 32 Gbps.
+    > **EH:** data rate will eventually go to 16 and 32 Gbps.
 
 Start experiment
 ================
 
-
-> EH: This is not really to check mult-cast logging, but the data being
+> **EH:** This is not really to check mult-cast logging, but the data being
 > sent in multicast messages. MONIT6 demonstrates that multicast is
 > working. I am hoping we can get rid of use the "monitor" program. To
 > be discussed with Chet
@@ -552,22 +542,14 @@ Start experiment
 Start non-FS multi-cast logging
 -------------------------------
 
-> EH: With influx logging of data, maybe we can get rid of this logging,
-> once influxDB is installed.
+> **EH:** With influx logging of data, maybe we can get rid of this logging,
+> once InfluxDB is installed.
 
-From a FS PC shell prompt, connect to mark5-19 (Wf)
-
-```tcsh
-ssh wfmark5-19
-```
-
-or monkey (Gs):
+From a FS PC shell prompt, connect to the backend PC
 
 ```tcsh
-ssh monkey
+ssh backend-pc
 ```
-
-> EH: ( is redundant) Kokee: is is backend-pc so: ssh backend-pc
 
 Start logging and exit:
 
@@ -582,17 +564,17 @@ Send "Ready" message
 From FS shell prompt, connect to monkey
 
 ```tcsh
-ssh -Y monkey
+ssh -Y backend-pc
 cd bin
 python vgos-msg-gui.py
 ```
 
-> EH: Different hosts at different sites of course, but
-> at KPGO I fixed this so .fvwm2rc short-cut Control-Shift-G starts it,
+> **EH:** Different hosts at different sites of course, but
+> at KPGO I fixed this so `.fvwm2rc` short-cut Control-Shift-G starts it,
 > all the sites should get that. Jason will eventually move
-> vgos-msg-gui.py to the FS machines so we can have better
+> `vgos-msg-gui.py` to the FS machines so we can have better
 > functionality. Maybe the placement of the window should be controlled
-> locally by .Xresources.
+> locally by `.Xresources`.
 
 At this point a GUI window should pop up. Enter the session name,
 station code (lower case) and select the type of message from the drop
@@ -618,7 +600,7 @@ In FS PC Shell, look at the list file `<schedule><stn id>.lst` created
 in the DRUDG step (eg. `v16033gs.lst`). Find the first observation and
 note line number 'nnn' after scan name at start of line.
 
-> EH: In a FS PC Shell *(xterm window)*, ...
+> **EH:** In a FS PC Shell *(xterm window)*, ...
 
 Now, in the FS, start schedule:
 
@@ -629,10 +611,10 @@ schedule=<session><stn id>,#<nnn>
 (**Note:** the pound sign (`#`) is required and there should be no space
 in the command)
 
-> *Dave: can you just do `schedule=<session><stn id>`? (does it find the
-> next scan after 5 min like AuScope?)*
+> **DH:** can you just do `schedule=<session><stn id>`? (does it find the
+> next scan after 5 min?)
 
-> EH: Well yes, if are more than five minutes from the start of
+> **EH:** Well yes, if are more than five minutes from the start of
 > schedule, but sometimes we start in the middle. Is it better to have
 > one description that works for all situations or two different ones,
 > what do you think? Your choice.
@@ -640,8 +622,7 @@ in the command)
 Send "Start" message
 --------------------
 
-Send "Start" message using the same procedure as in [Send "Ready"
-message].
+Send "Start" message using the same procedure as in [Send "Ready" message].
 
 Monitor experiment
 ==================
@@ -663,9 +644,9 @@ seconds and GBs of data (typically 30+), and 8 Gbps data rate. Be aware
 `scan_checks` *occasionally* fails.
 
 Position and size window for convenient viewing, new output will follow
-any changed size. You can stop this with `<Control>C`
+any changed size. You can stop this with `<Control>-C`
 
-> EH: I set up KPGO so that .fvwm2rc short-cut Control-Shift-K opens a
+> **EH:** I set up KPGO so that .fvwm2rc short-cut Control-Shift-K opens a
 > window with this output. The placement and size of the window is
 > controlled by .Xresources. I think everyone should get this if they
 > don't already have it.
@@ -677,16 +658,16 @@ Check the display for reasonable values:
 
 1.  DOT ticking and correct time
 
-> EH: new server/FS: and VDIF for all RDBEs agree
+> **EH:** new server/FS: and VDIF for all RDBEs agree
 
 2.  DOT2GPS value small (a few µseconds) and stable (varies by 0.1
     µseconds or less)
 
 3.  RMS value close to 32
 
-> EH: (note the display switches between IF0 and IF1 every second)
+> **EH:** (note the display switches between IF0 and IF1 every second)
 
-> EH: new server/FS: RMS value close to 20
+> **EH:** new server/FS: RMS value close to 20
 
 4.  Tsys IF0 and IF1 about 50-100, but may lower at Wf due to
     preliminary cal value, may be jumping a bit
@@ -713,12 +694,6 @@ From a FS PC shell prompt, connect to the backend-pc
 
 ```tcsh
 ssh backend-pc
-```
-
-or
-
-```tcsh
-ssh monkey
 ```
 
 then
@@ -773,20 +748,20 @@ azeloff=0d,0d
 Send "End" message
 ------------------
 
-Send "End" message using the same procedure as in 
-[Send "Ready" message]. Include details such as the stop time and the current
-weather conditions on-site.
+Send "End" message using the same procedure as in [Send "Ready" message].
+Include details such as the stop time and the current weather conditions
+on-site.
 
 Send test scan data files
 -------------------------
 
 In a terminal, log in to the Mark 6
 
-> EH: this is the part I know the least about and I suspect it different
+> **EH:** this is the part I know the least about and I suspect it different
 > for different stations, maybe using something besides "gather", have
 > tried it at GGAO?
 
-> *Dave*: I don't know enough about this. Maybe I need to ask Katie.
+> **DH:** I don't know enough about this. Maybe I need to ask Katie.
 
 ```tcsh
 ssh mark6a
@@ -795,8 +770,7 @@ dqa –d <filename>.vdif
 scp <filename>_*.vdif evlbi1.haystack.mit.edu:/data-st12/vgos/
 ```
 
-> EH: ('s are redundant) Maybe put into a script, or something, to
-> minimize typing? It is definitely too much typing
+> **EH:**  Maybe put into a script, or something, to minimize typing? It is definitely too much typing
 
 Remove the module for shipping
 ------------------------------
@@ -823,35 +797,19 @@ In FS, close experiment log:
 log=station
 ```
 
-In a terminal, copy the log to CDDIS and Haystack
-with
-```
-plog $sched
-```
-
-In a terminal, copy the log to CDDIS
+In a terminal, copy the log to CDDIS and Haystack with
 
 ```tcsh
-cd /usr2/log
-ftp cddisin.gsfc.nasa.gov
-user <your cddisin username>
-password <your cddisin password>
-put <session><stn id>.log      # eg 'v16033gs'
-quit
+plog <log file>
 ```
 
+If you are transferring the most recent log you can use
 ```tcsh
-curl -T <logname> -u 
+plog -l
 ```
 
-> EH: it seems like the typing here can be greatly reduced with ncftp
-> bookmarks or maybe there is something even better, I thought I had
-> already set that up for Katie, but couldn't find it. All the sites
-> should have that.
 
-And to Haystack:
-
-    scp <session><stn id>.log evlbi1.haystack.mit.edu:/data-st12/vgos/logs
+If this is not successful, see [Manually uploading log files] in the appendix
 
 Appendix
 ========
@@ -871,13 +829,34 @@ For each computer you want to enable password-less login, append your public
 key to `.ssh/authorized_keys` on the remote host. On a recent versions of the
 Field System OS (ie FSL9 based on Debian Wheezy) use the command
 
-```
-ssh-copy-id $host
-```
+    ssh-copy-id $host
 
 If this is not available use
 
     cat ~/.ssh/id_rsa.pub | ssh $host 'cat >> ~/.ssh/authorized_keys'
+
+
+If you do not wish to have *completely* password-less login, an alternative
+is to encrypt your ssh key with a password and use ssh-agent to unlock it
+for your session. The upshot is you only need to enter your password once
+per session. It is also more secure since the ssh key is encrypted on disk and
+if anyone ever takes your key, they can not gain access to your systems.
+
+*This is a good idea for laptops.*
+
+To encrypt your private key, enter a password when you generate it or, to
+(re)encrypt an old key, use
+
+    ssh-keygen -p -f ~/.ssh/id_rsa
+
+The process for adding your public key to a login to a remote host is the same as above.
+
+Now, when you want to use your ssh key, add it to your ssh-agent with
+
+    ssh-add ~/.ssh/id_rsa
+
+This will decrypt your private key in memory and ssh clients in the current session 
+can then use it to login as before. 
 
 Setting Up Password-less Log Transfers
 --------------------------------------
@@ -888,7 +867,26 @@ the following line to the `~/.netrc` file:
 
     machine cddisin.gsfc.nasa.gov login <username> password <password>
 
-replacing
+replacing the appropriate fields with your username and password.
+
+
+Manually uploading log files
+----------------------------
+
+In a terminal, copy the log to CDDIS
+
+```tcsh
+cd /usr2/log
+ftp cddisin.gsfc.nasa.gov
+user <your cddisin username>
+password <your cddisin password>
+put <session><stn id>.log      # eg 'v16033gs'
+quit
+```
+
+And to Haystack:
+
+    scp <session><stn id>.log evlbi1.haystack.mit.edu:/data-st12/vgos/logs
 
 Manually processing schedules
 -----------------------------
@@ -933,15 +931,16 @@ Schedule rotation
 
 6.  End DRUDG
 
-> EH: or reselect schedule (option #8)
+> **EH:** or reselect schedule (option #8)
 
 7.  Restart DRUDG with the new file to make the normal output
 
 Module conditioning
 -------------------
 
-> EH: no experience myself, have you tested?
-> DH: these are Katie's notes
+> **EH:** no experience myself, have you tested?
+>
+> **DH:** These are Katie's notes, I haven't tested them.
 
 1.  Load modules and enter da-client
 
@@ -955,7 +954,7 @@ Module conditioning
 3.  Create a new group with the modules you want to condition. If more
     than 1 module is being conditioned, group them together.
 
-        group=new:WXYZ; 
+        group=new:WXYZ;
         group=mount:WXYZ;
         group=open:WXYZ;
 

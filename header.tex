@@ -17,12 +17,9 @@
 \let\oldquote=\quote
 \let\endoldquote=\endquote
 
-\renewenvironment{quote}{\begin{tcolorbox}\begin{oldquote}}{\end{oldquote}\end{tcolorbox}}
-% \ifxetex\usepackage{framed}
-%   % \usepackage{xeCJK}
-%   % \setCJKmainfont{WenQuanYi Zen Hei}
-%   \setmainfont[Mapping=tex-text]{TeX Gyre Pagella}
-% \fi
+\renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm,colframe=red!75!black,colback=white]}{\end{tcolorbox}}
+%\renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm]\begin{oldquote}}{\end{oldquote}\end{tcolorbox}}
+    
 \makeatletter
 \renewcommand{\@maketitle}{%
     \newpage\null
@@ -33,6 +30,10 @@
             {\@date }%
     \par}
 \makeatother
+
+\usepackage[neverdecrease]{paralist}
+\setdefaultleftmargin{0.5cm}{}{}{}{}{}
+
 
 \newlength\mylen
 \setlength\mylen{\dimexpr\oddsidemargin+1in+\hoffset\relax}
@@ -82,6 +83,6 @@
     breakautoindent=true,
     escapeinside={\%*}{*)},
     xleftmargin=0em,
-    linewidth=\textwidth,
+    linewidth=\linewidth,
     basewidth=0.58em,
 }

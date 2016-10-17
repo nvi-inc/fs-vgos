@@ -19,7 +19,6 @@ all: pdf html docx
 		-V fontsize=12pt\
 		--latex-engine-opt '-shell-escape'\
 		-V subparagraph -V verbatim-in-note --number-sections $< -o $@
-	#	-V fontsize=12pt\
 	#--filter pandoc-minted
 		# --latex-engine=lualatex\
 	# pandoc -V subparagraph $< -o $@
