@@ -18,7 +18,7 @@ Setup Field System PC
 -   Check NTP: 
 
 ```tcsh
-ntpq -p
+ntpq -np
 ```
 
 The output is of the form
@@ -29,10 +29,16 @@ The output is of the form
     +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
 
 
-The offset should be small.
+The offsets should be small and there must be a server with an
+asterisk '*' in the first column. It may take a few minutes to get an '*'.
 
 Setup of RDBE from a cold start
 ===============================
+
+> **EH:** This section will change completely with the new server. It will
+boot to a state where the configuration step has finished. There will
+be a different status code to indicate success. It will just be
+necessary to sync after boot.
 
 Start RDBE server
 -----------------
@@ -153,8 +159,17 @@ Be sure to exit with `<Escape>`.
 > experiment, **all** the RDBEs must have their times reset before
 > recordings will work again.
 
+
+> **EH:** This will change with the new server/FS, which will display the
+VDIF epoch and FMSET will let you set it per RDBE. In that case, if
+one RDBE is rebooted after an epoch change (December 31 or June 30),
+that RDBE can be moved back to the previous epoch.
+
+Set-up of Mark 6 server from a cold start
+=====================================
+
 Check Mark 6 connection
-=======================
+-----------------------
 
 From the Field System, check the Mark 6 connection
 
@@ -165,6 +180,9 @@ mk6=dts_id
 You should receive a sensible response similar to
 
     !dts_id?0:Mark6-4605:1.0.24-1:1.2;
+
+Starting Mark 6 servers
+-----------------------
 
 If you receive an error, check that the Mark 6 servers are running. The
 programs `cplane` and `dplane` need to be running on the Mark 6. These
@@ -222,6 +240,8 @@ DRUDG experiment files
 
 To create the station specific SNAP and procedure files from the session
 schedule, fetch the schedule from IVS and drudg it with
+
+> **EH:** need to provide 'fesh' script, it will greatly simplify this step. Thanks.
 
 ```tcsh
 fesh -d <sched>
@@ -307,7 +327,7 @@ mk6bb
 auto                    # sets all attenuators three times
 ```
 
-> **EH:** with the new server/FS, the command no longer applies, the command
+> **EH:** with the new server/FS, the comment no longer applies, the command
 > is still "auto", but it only sets it once.
 
 Check the attenuation with
@@ -366,8 +386,8 @@ Once the antenna is on source, start the pointing check with
 fivept              
 ```
 
-This will take a few minutes. One complete `fivpt` will
-give you output in the form
+This will take a few minutes. Once complete `fivpt` will
+give you output in the form:
 
               Az        El        xEl_offs  El_offs
     xoffset   99.4469   30.8190   0.01417  -0.00806  0.00452  0.00801 1 1 01d0 virgoa
@@ -382,6 +402,20 @@ Next, measure the SEFDs on test source
 ```fs
 onoff
 ```
+
+This will also take a few minutes. Once complete `onoff` will
+give you output in the form:
+
+        source       Az   El  De   I P   Center   Comp   Tsys  SEFD  Tcal(j) Tcal(r)
+    VAL virgoa     170.9 63.0 15a0 1 l   3016.40 0.9943 52.03 2895.6  55.657  1.67
+    VAL virgoa     170.9 63.0 15a1 2 r   3016.40 1.0088 47.93 2549.8  53.201  1.60
+    VAL virgoa     170.9 63.0 15b0 3 l   5256.40 0.9946 49.58 2742.3  55.306  1.66
+    VAL virgoa     170.9 63.0 15b1 4 r   5256.40 1.0148 41.57 2549.6  61.331  1.84
+    VAL virgoa     170.9 63.0 15c0 5 l   6376.40 0.9831 42.57 2294.2  53.891  1.62
+    VAL virgoa     170.9 63.0 15c1 6 r   6376.40 0.9862 44.09 2248.1  50.992  1.53
+    VAL virgoa     170.9 63.0 15d0 7 l  10216.40 1.0121 51.91 3009.5  57.979  1.74
+    VAL virgoa     170.9 63.0 15d1 8 r  10216.40 0.9870 53.64 3084.2  57.496  1.72
+        source       Az   El  De   I P   Center   Comp   Tsys  SEFD  Tcal(j) Tcal(r)
 
 Verify SEFDs for eight bands are reasonable. 
 They should be in the range ~2000-3000.
@@ -536,13 +570,14 @@ Start experiment
 
 > **EH:** This is not really to check mult-cast logging, but the data being
 > sent in multicast messages. MONIT6 demonstrates that multicast is
-> working. I am hoping we can get rid of use the "monitor" program. To
-> be discussed with Chet
+> working. Maybe we can get rid of use the "monitor" program. To
+> be discussed with Chet. Comments on this (as well as everything else) from
+> sites would be helpful.
 
 Start non-FS multi-cast logging
 -------------------------------
 
-> **EH:** With influx logging of data, maybe we can get rid of this logging,
+> **EH:** With Influx logging of data, maybe we can get rid of this logging,
 > once InfluxDB is installed.
 
 From a FS PC shell prompt, connect to the backend PC
@@ -564,7 +599,7 @@ Send "Ready" message
 From FS shell prompt, connect to monkey
 
 ```tcsh
-ssh -Y backend-pc
+ssh -X backend-pc
 cd bin
 python vgos-msg-gui.py
 ```
@@ -596,11 +631,10 @@ down list.
 Start schedule
 --------------
 
-In FS PC Shell, look at the list file `<schedule><stn id>.lst` created
-in the DRUDG step (eg. `v16033gs.lst`). Find the first observation and
-note line number 'nnn' after scan name at start of line.
-
-> **EH:** In a FS PC Shell *(xterm window)*, ...
+In FS Linux shell (xterm), look at the list file `<schedule><stn
+id>.lst` created in the DRUDG step (eg. `v16033gs.lst`). Find the
+first observation and note line number 'nnn' after scan name at start
+of line.
 
 Now, in the FS, start schedule:
 
@@ -658,14 +692,13 @@ Check the display for reasonable values:
 
 1.  DOT ticking and correct time
 
-> **EH:** new server/FS: and VDIF for all RDBEs agree
+> **EH:** new server/FS: and VDIF epoches for all RDBEs agree
 
 2.  DOT2GPS value small (a few µseconds) and stable (varies by 0.1
     µseconds or less)
 
-3.  RMS value close to 32
-
-> **EH:** (note the display switches between IF0 and IF1 every second)
+3.  RMS value close to 32 (note that the display switches between IF0
+    and IF1 every second).
 
 > **EH:** new server/FS: RMS value close to 20
 
@@ -707,13 +740,26 @@ exit
 Check pointing and SEFDs
 ------------------------
 
-Load the pointing procedure file and send the antenna to an appropriate
-source (eg. casa)
+If the FS *not* been restarted since the initial check, then the only set-up you will need is command the source (e.q. casa):
 
 ```fs
 proc=point
 initp
 casa
+```
+
+If the FS has been restarted since the initial, you will need to reset
+everything and send the antenna to an appropriate source (eg. casa)
+
+```fs
+proc=point
+initp
+casa
+proc=<schedule><stn id> # eg. 'v16033gs'
+setupbb
+ifdbb
+mk6bb
+auto
 ```
 
 Wait until the antenna is on source. You can either watch the log or
@@ -726,6 +772,8 @@ onsource
 The result should be "tracking".
 
 As in the [Check pointing] section in pre-experiment, run a pointing check
+
+> **EH** Link is not visible in .pdf, but does work.
 
 ```fs
 fivept
@@ -799,15 +847,17 @@ log=station
 
 In a terminal, copy the log to CDDIS and Haystack with
 
+> **EH:** need to provide 'plog' script, it will greatly simplify this step. Thanks.
+
 ```tcsh
-plog <log file>
+plog <log file path> # eg /usr2/log/v16033gs.log
 ```
 
 If you are transferring the most recent log you can use
+
 ```tcsh
 plog -l
 ```
-
 
 If this is not successful, see [Manually uploading log files] in the appendix
 
@@ -835,7 +885,6 @@ If this is not available use
 
     cat ~/.ssh/id_rsa.pub | ssh $host 'cat >> ~/.ssh/authorized_keys'
 
-
 If you do not wish to have *completely* password-less login, an alternative
 is to encrypt your ssh key with a password and use ssh-agent to unlock it
 for your session. The upshot is you only need to enter your password once
@@ -843,6 +892,8 @@ per session. It is also more secure since the ssh key is encrypted on disk and
 if anyone ever takes your key, they can not gain access to your systems.
 
 *This is a good idea for laptops.*
+
+> **EH** This is *not* a good idea for oper account on FS machine.
 
 To encrypt your private key, enter a password when you generate it or, to
 (re)encrypt an old key, use
