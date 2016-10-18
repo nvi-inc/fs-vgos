@@ -1,5 +1,5 @@
 % VGOS Operations Notes
-%
+% KPGO
 % October 2016
 
 Setup Field System PC
@@ -30,7 +30,7 @@ The output is of the form
 
 
 The offsets should be small and there must be a server with an
-asterisk '*' in the first column. It may take a few minutes to get an '*'.
+asterisk `*` in the first column. It may take a few minutes to get an `*`.
 
 Setup of RDBE from a cold start
 ===============================
@@ -49,9 +49,11 @@ From FS PC shell prompt, login to each RDBE:
 ssh root@rdbe<id>
 ```
 
-> **EH:** All devices should be set-up so the operator can ssh into then
+> **EH:** All devices should be set-up so the operator can ssh into them
 > without providing a password. That isn't part of the procedure, but
 > maybe should be noted somewhere (other issues?).
+
+> **DH:** There are notes in the appendix for this
 
 use `<id>=a`, `b`, `c`, or `d` to log into RDBE-`<id>`.
 
@@ -158,7 +160,6 @@ Be sure to exit with `<Escape>`.
 > RDBE gets its time reset after that but before the end of the
 > experiment, **all** the RDBEs must have their times reset before
 > recordings will work again.
-
 
 > **EH:** This will change with the new server/FS, which will display the
 VDIF epoch and FMSET will let you set it per RDBE. In that case, if
@@ -871,7 +872,7 @@ It is convenient to setup password-less login for local devices from the Field
 System PC. You can do this with SSH using public-key cryptography. To generate
 public/private key pair with SSH (if you don't already have one), run
 
-        ssh-keygen
+    ssh-keygen
 
 Accept the defaults and enter a blank password when prompted.
 
