@@ -749,7 +749,7 @@ initp
 casa
 ```
 
-If the FS has been restarted since the initial, you will need to reset
+If the FS has been restarted since the initial setup, you will need to reset
 everything and send the antenna to an appropriate source (eg. casa)
 
 ```fs
@@ -773,8 +773,6 @@ onsource
 The result should be "tracking".
 
 As in the [Check pointing] section in pre-experiment, run a pointing check
-
-> **EH** Link is not visible in .pdf, but does work.
 
 ```fs
 fivept
@@ -810,7 +808,8 @@ In a terminal, log in to the Mark 6
 > for different stations, maybe using something besides "gather", have
 > tried it at GGAO?
 
-> **DH:** I don't know enough about this. Maybe I need to ask Katie.
+> **DH:** I don't know enough about this. Maybe I need to ask Katie. Comments from other stations might
+> be needed here.
 
 ```tcsh
 ssh mark6a
@@ -850,6 +849,8 @@ In a terminal, copy the log to CDDIS and Haystack with
 
 > **EH:** need to provide 'plog' script, it will greatly simplify this step. Thanks.
 
+> **DH:** `plog` and `fesh` are in `fs-9.12.8/misc`
+
 ```tcsh
 plog <log file path> # eg /usr2/log/v16033gs.log
 ```
@@ -888,16 +889,24 @@ If this is not available use
 
 If you do not wish to have *completely* password-less login, an alternative
 is to encrypt your ssh key with a password and use ssh-agent to unlock it
-for your session. The upshot is you only need to enter your password once
-per session. It is also more secure since the ssh key is encrypted on disk and
-if anyone ever takes your key, they can not gain access to your systems.
+for your session. The upshot is you still have the convenience of
+password-less login, you just have to enter your password **once**
+after you login to the FS computer. 
 
-*This is a good idea for laptops.*
+This is also more secure since the ssh key is encrypted on disk and if anyone
+ever takes your key, they can not gain access to your systems. 
 
-> **EH** This is *not* a good idea for oper account on FS machine.
+This is a good idea for remote terminals, although is slightly more cumbersome for 
+local access.
 
-To encrypt your private key, enter a password when you generate it or, to
-(re)encrypt an old key, use
+> **EH:** This is *not* a good idea for oper account on FS machine.
+
+> **DH:** It requires a password to be entered once per login session (after `ssh-add`).
+> It seems like a good balance between security and convenience if a site is more
+> concerned. But probably not necessary for oper@pcfs.
+
+To encrypt your private key, enter a password when you generate it. To 
+encrypt an old key, or change its password, use
 
     ssh-keygen -p -f ~/.ssh/id_rsa
 
@@ -907,8 +916,8 @@ Now, when you want to use your ssh key, add it to your ssh-agent with
 
     ssh-add ~/.ssh/id_rsa
 
-This will decrypt your private key in memory and ssh clients in the current session 
-can then use it to login as before. 
+This will decrypt your private key and allow any ssh clients the current login
+session to use it without a password.
 
 Setting Up Password-less Log Transfers
 --------------------------------------
@@ -991,8 +1000,9 @@ Module conditioning
 -------------------
 
 > **EH:** no experience myself, have you tested?
->
+
 > **DH:** These are Katie's notes, I haven't tested them.
+> it's almost worth
 
 1.  Load modules and enter da-client
 
