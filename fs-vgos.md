@@ -72,6 +72,10 @@ all the RDBEs have started from the FS with:
 rdbe_status
 ```
 
+> **Chris**: Example of rdbe_status output for Kokee is "0:0x0941". We found
+that if this number is different than above system does not work
+properly so we note it in our procedure.
+
 There will be an error for each RDBE that is not ready. When all RDBEs
 respond with a status value `0x0e01`, proceed to the next step.
 
@@ -203,7 +207,98 @@ If they are not, start them
 /etc/init.d/cplane start
 ```
 
-Note: dplane must be started before cplane.
+> **Chris**: After setting up Mk6
+server we would normally setup up our disks modules at this point. We
+found that this is one of the more likely problem areas while setting up
+so we like to set it up early in the process to give time to resolve
+issues if needed.
+
+1.  This is to help with debugging, display and clear the Mark 6 message
+    queue:
+
+    ```fs
+    mk6=msg?
+    ```
+
+    If an unexplained error happens during the following procedure,
+    please use this command again to get more information.
+
+2.  Initialize module; create, mount, and open module
+
+    Check status:
+
+    ```fs
+    mk6=mstat?all
+    ```
+
+    After the two fields: return code and `cplane` status (hopefully
+    `mstat?0:0`) there are 10 fields per group:
+
+        group:slot:eMSN:#disks found:#disks nominal:free space:total space:status1:status2:type
+
+    It may be easier to read if individual groups are queried; eg. for
+    group 1:
+
+    ```fs
+    mk6=mstat?1
+    ```
+
+    If the module has already been initialized, ie `status1` is
+    `initialized`, and the data is no longer needed (**be certain**),
+    erase it:
+
+    ```fs
+    mk6=group=unprotect:<group>
+    mk6=group=erase:<group>
+    ```
+
+    If the module has not been initialized (`status1` is "unknown" and
+    no `eMSN`?), initialize it:
+
+    ```fs
+    mk6=mod_init=<slot#>:<#disks>:<MSN>:<type>:<new>
+    ```
+
+    For example
+
+    ```fs
+    mk6=mod_init=1:8:HAY%0001:sg:new
+    ```
+
+    > **Note:** due to a current bug, the FS--Mark 6 connection will
+    > timeout during long running commands such as this.
+    >
+    > Until this is fixed, you may want to run this command directly on
+    > the Mark 6 with
+    >
+    > ```tcsh
+    > ssh root@mark6a
+    > da_client
+    > mod_init=<slot#>:<#disks>:<MSN>:<type>:<new>;
+    > ```
+    >
+    > note the final semicolon is necesseary in `da_client` but is
+    > automatically added by the FS.
+
+    Create, open and mount the group:
+
+    ```fs
+    mk6=group=new:<slots>
+    mk6=group=mount:<slots>
+    mk6=group=open:<slots>
+    ```
+
+    (Slots is a list of slot numbers included in the group, without any
+    seperates eg `<slots>=12`)
+
+    To query if the group is created properly:
+
+    ```fs
+    mk6=group?;
+    ```
+
+    Print out should have the group number at the end. If it is `-`,
+    something has gone wrong.
 
 Setup MCI server
 ================
@@ -236,8 +331,27 @@ If the server is not running, start it with
 ./startmciserver
 ```
 
+> **Chris**: This section is completely different at KPGO currently so below
+the GGAO site specific procedures are KPGO procedures highlighted.
+
+> This is site specific to KPGO
+
+Log into the Hub PC in new Xterm window of FS
+
+> ssh oper@128.171.102.237 ps aux|grep mci (to see if mci server is
+> running) startmciserver (to start the server if not running)
+
+Log into the Backend PC in new Xterm window on FS
+
+> ssh oper@128.171.102.224 mci\_client.py 128.171.102.237 5000 (opens
+> mci client on backend pc) mci\_data? (displays all mci data points
+> current state including dewar temperatures)
+
 DRUDG experiment files
 ======================
+
+> **Chris**: we manually receive and process schedules as described in the
+appendix.
 
 To create the station specific SNAP and procedure files from the session
 schedule, fetch the schedule from IVS and drudg it with
@@ -300,6 +414,11 @@ proc=point
 initp
 casa
 ```
+
+> verify Az and El for source are acceptable antenna=operate
+
+> **Chris**: We normally do not have the antenna in operate mode until good
+Az and El positions are verified for the selected source
 
 The following sources are most reliable for these small antennas are:
 
@@ -368,6 +487,11 @@ mon<id>
 
 where `<id>=a, b, c, or d` (eg. `mona` etc.)
 
+
+> **Chris**: we would typically do this before pointing and test scan.
+
+    rdbe=data_connect? (verifies that band a,b,c,and d equal 0,1,2,and 3)
+
 Check pointing
 --------------
 
@@ -429,6 +553,15 @@ azeloff=0d,0d
 
 Make test recording
 -------------------
+
+> **Chris**: we normally would do the below two commands at this point to
+check the Mk6 inputs before doing test scan.
+
+    mk6in             (checks data rates on Ethernet ports) 
+    mk6=input_stream? (shows in more detail the Ethernet ports state for the Mk6)
+
+> **Chris**: At this point we normally have our disk modules setup and would
+move to step #3.
 
 1.  This is to help with debugging, display and clear the Mark 6 message
     queue:
@@ -746,8 +879,14 @@ If the FS *not* been restarted since the initial check, then the only set-up you
 ```fs
 proc=point
 initp
+```
+>**Chris:**
+>    antenna=off (to allow us to verify Az and El for source before antenna moves)
+```
 casa
 ```
+>**Chris:** verify Az and El are acceptable
+>    antenna=operate
 
 If the FS has been restarted since the initial setup, you will need to reset
 everything and send the antenna to an appropriate source (eg. casa)
@@ -792,6 +931,11 @@ Finally, zero the offsets
 azeloff=0d,0d
 ```
 
+> **Chris**: we would normally stow the antenna at this point and go to
+standby mode with drives off.
+
+> source=stow antenna=off
+
 Send "End" message
 ------------------
 
@@ -801,6 +945,12 @@ on-site.
 
 Send test scan data files
 -------------------------
+
+> **Chris**: This section is completely different for KPGO, due to our
+e-transfer Mk6 being a different unit than our operational Mk6. Also for
+actually sending entire experiments not just test scans. Below the
+original steps provided in this procedure are the KPGO site specific
+steps highlighted.
 
 In a terminal, log in to the Mark 6
 
@@ -832,12 +982,86 @@ mk6=group=unmount:<slots>
 
 Before removing, check the modules are unmounted with
 
+> key off disk before doing `mk6=mstat?all`
+
 ```fs
 mk6=mstat?all
 ```
 
+> **Chris**: KPGO site specific send test scan and e-transfer procedure
+
+Close and unmount disk module(s) and prepare for e-transferring a scan
+or experiment.
+
+> Mk6=group=close:<slots>; Mk6=group=unmount:<slots>; turn keys off,
+> remove module(s) Mk6=mstat?all; (to clear module info and check the
+> modules are unmounted)
+
+Insert Mark6 modules into the e-tranfer Mark6
+
+From the da-client mount the modules and verify all disks are seen:
+
+> da-client group=mount:<slots>; mstat?all (if you get â€œ6:0:1â€
+> restart cplane) group=open:<slots> list?
+
+From another xterm window gather the scan(s) to your RAID disk, and
+de-thread if necessary:
+
+For test scan that needs to be de-threaded:
+
+> gator <slots> <scan name>.vdif /mnt/raid dqa â€“d <scan name>.vdif
+> (this will create 4files with thread ID on scan name)
+
+For scans where you intend to transfer the entire experiment use
+gather464:
+
+> gator â€“t <slots> â€œscan nameâ€.vdif /mnt/raid
+
+Start tsunami server specifying the scans of the session to transfer
+
+> tsunamid <scan_name>\_\*.vdif
+
+You will see the available scans to be pulled
+
+At another xterm window (in â€œoperâ€, not â€œrootâ€)
+
+Ssh to Haystack storage nodes &gt;ssh evlbi1.haystack.mit.edu
+&gt;password is oper password
+
+> cd /data-st12/vgos
+
+Run tsunami, setting the transfer rate, error free, and connecting back
+to your machine
+
+> tsunami set rate 100M set error 0 connect 146.88.148.18
+
+Make sure needed files are there to be pulled
+
+> dir
+
+Pull files
+
+> get \*
+
+Once transfer is complete exit tsunami client to get prompt back
+
+> exit ls <scan_name>\* (verify all scans were copied)
+
+After last scan has copied logout
+
+> logout ctrl C (to quit server)
+
+From da-client unmount the disk and prepare for shipping
+
+> group=unmount:<slots> turn keys off, remove modules mk6=mstat?all;
+> (clears module info and checks the modules are unmounted)
+
 Transfer log file
 -----------------
+
+> **Chris**: (We normally will have already completed this section prior to
+e-tranfer of test scan, manually like described in the appendix)
+> **Chris**: normally done before e-transfer of test scan.
 
 In FS, close experiment log:
 
