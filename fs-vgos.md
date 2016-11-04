@@ -337,14 +337,15 @@ the GGAO site specific procedures are KPGO procedures highlighted.
 
 Log into the Hub PC in new Xterm window of FS
 
-> ssh oper@128.171.102.237 ps aux|grep mci (to see if mci server is
-> running) startmciserver (to start the server if not running)
+     ssh oper@128.171.102.237 
+     ps aux|grep mci (to see if mci server is running)
+     startmciserver (to start the server if not running)
 
 Log into the Backend PC in new Xterm window on FS
 
-> ssh oper@128.171.102.224 mci\_client.py 128.171.102.237 5000 (opens
-> mci client on backend pc) mci\_data? (displays all mci data points
-> current state including dewar temperatures)
+    ssh oper@128.171.102.224
+    mci_client.py 128.171.102.237 5000 (opens mci client on backend pc)
+    mci_data? (displays all mci data points current state including dewar temperatures)
 
 DRUDG experiment files
 ======================
@@ -993,69 +994,87 @@ mk6=mstat?all
 Close and unmount disk module(s) and prepare for e-transferring a scan
 or experiment.
 
-> Mk6=group=close:<slots>; Mk6=group=unmount:<slots>; turn keys off,
-> remove module(s) Mk6=mstat?all; (to clear module info and check the
-> modules are unmounted)
+    mk6=group=close:<slots>
+    mk6=group=unmount:<slots>
+
+turn keys off, remove module(s) 
+
+    mk6=mstat?all;
+
+(to clear module info and check the modules are unmounted)
 
 Insert Mark6 modules into the e-tranfer Mark6
 
 From the da-client mount the modules and verify all disks are seen:
 
-> da-client group=mount:<slots>; mstat?all (if you get "6:0:1"
-> restart cplane) group=open:<slots> list?
+    da-client 
+    group=mount:<slots>;
+    mstat?all; 
+
+(if you get "6:0:1" restart cplane) 
+
+    group=open:<slots> list?
 
 From another xterm window gather the scan(s) to your RAID disk, and
 de-thread if necessary:
 
 For test scan that needs to be de-threaded:
 
-> gator <slots> <scan name>.vdif /mnt/raid 
-> dqa -d <scan name>.vdif
-> (this will create 4files with thread ID on scan name)
+    gator <slots> <scan name>.vdif /mnt/raid 
+    dqa -d <scan name>.vdif
+
+(this will create 4 files with thread ID on scan name)
 
 For scans where you intend to transfer the entire experiment use
 gather464:
 
-> gator -t <slots> "scan name".vdif /mnt/raid
+    gator -t <slots> "scan name".vdif /mnt/raid
 
 Start tsunami server specifying the scans of the session to transfer
 
-> tsunamid <scan_name>\_\*.vdif
+    tsunamid <scan_name>_*.vdif
 
 You will see the available scans to be pulled
 
 At another xterm window (in "oper", not "root")
 
-Ssh to Haystack storage nodes &gt;ssh evlbi1.haystack.mit.edu
-&gt;password is oper password
+Ssh to Haystack storage nodes:
 
-> cd /data-st12/vgos
+    ssh evlbi1.haystack.mit.edu  (password is oper password)
+    cd /data-st12/vgos
 
 Run tsunami, setting the transfer rate, error free, and connecting back
 to your machine
 
-> tsunami set rate 100M set error 0 connect 146.88.148.18
+    tsunami set rate 100M set error 0 connect 146.88.148.18
 
 Make sure needed files are there to be pulled
 
-> dir
+    dir
 
 Pull files
 
-> get \*
+    get *
 
 Once transfer is complete exit tsunami client to get prompt back
 
-> exit ls <scan_name>\* (verify all scans were copied)
+    exit
+    ls <scan_name>*  (verify all scans were copied)
 
 After last scan has copied logout
 
-> logout ctrl C (to quit server)
+    logout
+    <Ctrl-C> (to quit server)
 
 From da-client unmount the disk and prepare for shipping
 
-> group=unmount:<slots> turn keys off, remove modules mk6=mstat?all;
-> (clears module info and checks the modules are unmounted)
+    group=unmount:<slots>;
+
+turn keys off, remove modules
+
+    mk6=mstat?all;
+
+(clears module info and checks the modules are unmounted)
 
 Transfer log file
 -----------------
