@@ -15,7 +15,7 @@ Setup Field System PC
 -   Start FS computer (if needed)
 -   Login as user `oper`
 
--   Check NTP: 
+-   Check NTP:
 
 ```tcsh
 ntpq -np
@@ -337,7 +337,7 @@ the GGAO site specific procedures are KPGO procedures highlighted.
 
 Log into the Hub PC in new Xterm window of FS
 
-     ssh oper@128.171.102.237 
+     ssh oper@128.171.102.237
      ps aux|grep mci (to see if mci server is running)
      startmciserver (to start the server if not running)
 
@@ -415,10 +415,14 @@ initp
 casa
 ```
 
-> verify Az and El for source are acceptable antenna=operate
+> verify Az and El for source are acceptable
+>
+>     antenna=operate
+>
 
 > **Chris**: We normally do not have the antenna in operate mode until good
 Az and El positions are verified for the selected source
+
 
 The following sources are most reliable for these small antennas are:
 
@@ -499,7 +503,7 @@ Check is the antenna is now on the source we selected earlier with the
 FS command
 
 ```fs
-onsource            
+onsource
 ```
 
 The result should be `TRACKING`. If the antenna status is still
@@ -508,7 +512,7 @@ The result should be `TRACKING`. If the antenna status is still
 Once the antenna is on source, start the pointing check with
 
 ```fs
-fivept              
+fivept
 ```
 
 This will take a few minutes. Once complete `fivpt` will
@@ -542,7 +546,7 @@ give you output in the form:
     VAL virgoa     170.9 63.0 15d1 8 r  10216.40 0.9870 53.64 3084.2  57.496  1.72
         source       Az   El  De   I P   Center   Comp   Tsys  SEFD  Tcal(j) Tcal(r)
 
-Verify SEFDs for eight bands are reasonable. 
+Verify SEFDs for eight bands are reasonable.
 They should be in the range ~2000-3000.
 
 Finally, zero the offsets
@@ -557,7 +561,7 @@ Make test recording
 > **Chris**: we normally would do the below two commands at this point to
 check the Mk6 inputs before doing test scan.
 
-    mk6in             (checks data rates on Ethernet ports) 
+    mk6in             (checks data rates on Ethernet ports)
     mk6=input_stream? (shows in more detail the Ethernet ports state for the Mk6)
 
 > **Chris**: At this point we normally have our disk modules setup and would
@@ -765,7 +769,7 @@ down list.
 Start schedule
 --------------
 
-In FS Linux shell (xterm), look at the list file 
+In FS Linux shell (xterm), look at the list file
 `<schedule><stn id>.lst` created in the DRUDG step (eg. `v16033gs.lst`). Find the
 first observation and note line number 'nnn' after scan name at start
 of line.
@@ -907,7 +911,7 @@ Wait until the antenna is on source. You can either watch the log or
 check with
 
 ```fs
-onsource 
+onsource
 ```
 
 The result should be "tracking".
@@ -997,7 +1001,7 @@ or experiment.
     mk6=group=close:<slots>
     mk6=group=unmount:<slots>
 
-turn keys off, remove module(s) 
+turn keys off, remove module(s)
 
     mk6=mstat?all;
 
@@ -1007,11 +1011,11 @@ Insert Mark6 modules into the e-tranfer Mark6
 
 From the da-client mount the modules and verify all disks are seen:
 
-    da-client 
+    da-client
     group=mount:<slots>;
-    mstat?all; 
+    mstat?all;
 
-(if you get "6:0:1" restart cplane) 
+(if you get "6:0:1" restart cplane)
 
     group=open:<slots> list?
 
@@ -1020,7 +1024,7 @@ de-thread if necessary:
 
 For test scan that needs to be de-threaded:
 
-    gator <slots> <scan name>.vdif /mnt/raid 
+    gator <slots> <scan name>.vdif /mnt/raid
     dqa -d <scan name>.vdif
 
 (this will create 4 files with thread ID on scan name)
@@ -1079,8 +1083,9 @@ turn keys off, remove modules
 Transfer log file
 -----------------
 
-> **Chris**: (We normally will have already completed this section prior to
-e-tranfer of test scan, manually like described in the appendix)
+> **Chris**: (We normally will have already completed this section prior to e-tranfer of test scan, manually like described in the appendix)
+
+
 > **Chris**: normally done before e-transfer of test scan.
 
 In FS, close experiment log:
@@ -1135,12 +1140,12 @@ If you do not wish to have *completely* password-less login, an alternative
 is to encrypt your ssh key with a password and use ssh-agent to unlock it
 for your session. The upshot is you still have the convenience of
 password-less login, you just have to enter your password **once**
-after you login to the FS computer. 
+after you login to the FS computer.
 
 This is also more secure since the ssh key is encrypted on disk and if anyone
-ever takes your key, they can not gain access to your systems. 
+ever takes your key, they can not gain access to your systems.
 
-This is a good idea for remote terminals, although is slightly more cumbersome for 
+This is a good idea for remote terminals, although is slightly more cumbersome for
 local access.
 
 > **EH:** This is *not* a good idea for oper account on FS machine.
@@ -1149,7 +1154,7 @@ local access.
 > It seems like a good balance between security and convenience if a site is more
 > concerned. But probably not necessary for oper@pcfs.
 
-To encrypt your private key, enter a password when you generate it. To 
+To encrypt your private key, enter a password when you generate it. To
 encrypt an old key, or change its password, use
 
     ssh-keygen -p -f ~/.ssh/id_rsa
@@ -1269,7 +1274,7 @@ Module conditioning
 4.  Check to the status. It should say "open:ready" for the modules
     included in the group.
 
-    mstat?all;
+        mstat?all;
 
 5.  Leave `da-client` and navigate to bin.
 
