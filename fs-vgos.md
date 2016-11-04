@@ -207,11 +207,10 @@ If they are not, start them
 /etc/init.d/cplane start
 ```
 
-> **Chris**: After setting up Mk6
-server we would normally setup up our disks modules at this point. We
-found that this is one of the more likely problem areas while setting up
-so we like to set it up early in the process to give time to resolve
-issues if needed.
+> **Chris**: After setting up Mk6 server we would normally setup up our
+> disks modules at this point. We found that this is one of the more
+> likely problem areas while setting up so we like to set it up early in
+> the process to give time to resolve issues if needed.
 
 1.  This is to help with debugging, display and clear the Mark 6 message
     queue:
@@ -765,8 +764,8 @@ down list.
 Start schedule
 --------------
 
-In FS Linux shell (xterm), look at the list file `<schedule><stn
-id>.lst` created in the DRUDG step (eg. `v16033gs.lst`). Find the
+In FS Linux shell (xterm), look at the list file 
+`<schedule><stn id>.lst` created in the DRUDG step (eg. `v16033gs.lst`). Find the
 first observation and note line number 'nnn' after scan name at start
 of line.
 
@@ -882,6 +881,7 @@ initp
 ```
 >**Chris:**
 >    antenna=off (to allow us to verify Az and El for source before antenna moves)
+
 ```
 casa
 ```
@@ -1001,7 +1001,7 @@ Insert Mark6 modules into the e-tranfer Mark6
 
 From the da-client mount the modules and verify all disks are seen:
 
-> da-client group=mount:<slots>; mstat?all (if you get â€œ6:0:1â€
+> da-client group=mount:<slots>; mstat?all (if you get "6:0:1"
 > restart cplane) group=open:<slots> list?
 
 From another xterm window gather the scan(s) to your RAID disk, and
@@ -1009,13 +1009,14 @@ de-thread if necessary:
 
 For test scan that needs to be de-threaded:
 
-> gator <slots> <scan name>.vdif /mnt/raid dqa â€“d <scan name>.vdif
+> gator <slots> <scan name>.vdif /mnt/raid 
+> dqa -d <scan name>.vdif
 > (this will create 4files with thread ID on scan name)
 
 For scans where you intend to transfer the entire experiment use
 gather464:
 
-> gator â€“t <slots> â€œscan nameâ€.vdif /mnt/raid
+> gator -t <slots> "scan name".vdif /mnt/raid
 
 Start tsunami server specifying the scans of the session to transfer
 
@@ -1023,7 +1024,7 @@ Start tsunami server specifying the scans of the session to transfer
 
 You will see the available scans to be pulled
 
-At another xterm window (in â€œoperâ€, not â€œrootâ€)
+At another xterm window (in "oper", not "root")
 
 Ssh to Haystack storage nodes &gt;ssh evlbi1.haystack.mit.edu
 &gt;password is oper password
