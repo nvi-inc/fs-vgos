@@ -17,9 +17,16 @@
 \let\oldquote=\quote
 \let\endoldquote=\endquote
 
-\hypersetup{colorlinks=false,
-            allbordercolors={0 0 0},
-            pdfborderstyle={/S/U/W 1}}
+\hypersetup{colorlinks=true,
+            linkcolor=blue,
+}
+%            pdfpagemode=FullScreen
+
+\urlstyle{same}
+            
+% \hypersetup{colorlinks=false,
+%             allbordercolors={0 0 0},
+%             pdfborderstyle={/S/U/W 1}}
 
 \renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm,colframe=red!75!black,colback=white]}{\end{tcolorbox}}
 %\renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm]\begin{oldquote}}{\end{oldquote}\end{tcolorbox}}
@@ -76,7 +83,7 @@
     numberstyle=\footnotesize,
     stepnumber=1,
     numbersep=5pt,
-    backgroundcolor=\color[RGB]{234,237,234},
+    backgroundcolor=\color[RGB]{240,243,240},
     showspaces=false,
     showstringspaces=false,
     showtabs=false,
