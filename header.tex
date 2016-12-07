@@ -6,9 +6,13 @@
 % \usepackage{tgpagella}
 % \usepackage{tgtermes}
 % \setmainfont[Mapping=tex-text]{TeX Gyre Heros}
-\setmainfont[Mapping=tex-text]{Roboto}
 % \setmainfont[Mapping=tex-text]{TeX Gyre Pagella}
 % \setmainfont[Mapping=tex-text]{TeX Gyre Termes}
+ 
+\usepackage{setspace}
+\linespread{0.9}
+
+\setmainfont[Mapping=tex-text]{Roboto}
 \setmonofont{Roboto Mono}
 \usepackage{microtype}
 
@@ -17,19 +21,31 @@
 \let\oldquote=\quote
 \let\endoldquote=\endquote
 
-\hypersetup{colorlinks=true,
-            linkcolor=blue,
+\usepackage{xcolor}
+
+\definecolor{bbb}{rgb}{0.148438,0.542969,0.820312}
+
+\hypersetup{colorlinks=true, linkcolor={bbb},
 }
+% \urlstyle{same}
 %            pdfpagemode=FullScreen
 
-\urlstyle{same}
             
 % \hypersetup{colorlinks=false,
 %             allbordercolors={0 0 0},
 %             pdfborderstyle={/S/U/W 1}}
 
-\renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm,colframe=red!75!black,colback=white]}{\end{tcolorbox}}
-%\renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm]\begin{oldquote}}{\end{oldquote}\end{tcolorbox}}
+% \renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm, colframe=red!75!black,colback=white]}{\end{tcolorbox}}
+% \renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm, colframe=red!75!black,colback=white]}{\end{tcolorbox}}
+% \renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm]\begin{oldquote}}{\end{oldquote}\end{tcolorbox}}
+    % 
+
+% \usepackage{xargs} 
+% \usepackage{framed} 
+% \renewenvironmentx{leftbar}[2][1=0.5pt, 2=5pt]%
+% {\def\FrameCommand{\vrule width #1 \hspace{#2}}\MakeFramed {\advance\hsize-\width \FrameRestore}}%
+% {\endMakeFramed}
+% \renewenvironment{quote}{\begin{leftbar}\begin{oldquote}}{\end{oldquote}\end{leftbar}}
     
 \makeatletter
 \renewcommand{\@maketitle}{%
@@ -83,7 +99,7 @@
     numberstyle=\footnotesize,
     stepnumber=1,
     numbersep=5pt,
-    backgroundcolor=\color[RGB]{240,243,240},
+    backgroundcolor=\color[RGB]{246,246,250},
     showspaces=false,
     showstringspaces=false,
     showtabs=false,
@@ -95,5 +111,5 @@
     escapeinside={\%*}{*)},
     xleftmargin=0em,
     linewidth=\linewidth,
-    basewidth=0.58em,
+    basewidth=0.59em,
 }

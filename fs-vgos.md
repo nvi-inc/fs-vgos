@@ -2,10 +2,10 @@
 % KPGO
 % October 2016
 
-These notes cover basic procedures for running VGOS experiment
-operations with the FS.  They are described in a logical order for the
-tasks that need to be completed.  If another order of operations make
-more sense for some locale that is fine of course.
+These notes cover basic procedures for running VGOS experiment operations with
+the Field System (FS).  They are described in a logical order for the tasks
+that need to be completed.  If another order of operations make more sense for
+some locale that is fine of course.
 
 A basic assumption is that all the equipment is already up and
 running.  The procedures check this and refer to the appendix for
@@ -13,37 +13,43 @@ set-up instructions for a device if it isn't already running.  In
 addition to these setup procedures, the appendix also contains
 instructions for some other useful operations.
 
-As written here, the procedures are mostly station independent.
-However, some station dependencies are noted.  These only cover GGAO
-and KPGO for now but Westford can, and will, be added.  Some of the
-station dependencies can be removed by writting some additional
-scripts that hid the dependencies.  This is also a good idea because
-the scripts can reduce the complexity of the operations.
+As written here, the procedures are mostly station independent. However, some
+station dependencies are noted.  These only cover GGAO and KPGO for now but
+Westford can, and will, be added.  Some of the station dependencies can be
+removed by writing some additional scripts that hid the dependencies.  This is
+also a good idea because the scripts can reduce the complexity of the
+operations.
 
 > **EH:** The etransfer instructions need to be checked.
 
-DRUDG experiment files
-======================
+Pre-setup
+=========
 
-This step is first for two reasons.  First, the schedule file is
-typically available before the day of the experiment.  Secondly, the
-number of modules in a recording group may eventually depend on the
-experiment.  When that is the case, the number needed will conveyed
-through the listing that is made in this step.
+DRUDG experiment files
+----------------------
+
+This step is first for two reasons.  First, the schedule file is typically
+available before the day of the experiment.  Secondly, the number of modules in
+a recording group may eventually depend on the experiment.  When that is the
+case, the number needed will conveyed through the listing that is made in this
+step.
 
 To create the station specific SNAP and procedure files from the session
-schedule, fetch the schedule from IVS and drudg it with
+schedule, fetch the schedule from IVS and drudg by entering, in a FS PC shell,
+the command
 
 ```tcsh
 fesh -d <sched>
 ```
 where `<sched>` is the schedule name, eg `v16033`.
 
+This will create the schedule for the FS to run, and
+
 If you have manually received the schedule, follow the instructions in
 the [Manually processing schedules] section of the appendix.
 
-Experiment set-up
-=================
+Experiment setup
+================
 
 Start FS log file
 -----------------
@@ -58,8 +64,6 @@ log=<schedule><stn id> # eg v16033gs
 Check RDBE Status
 -----------------
 
-New server:
-
 From the Field System, check the RDBEs
 
 ```fs
@@ -67,18 +71,18 @@ rdbe_staus
 ```
 
 > Old Server:
-> The response values should be '0x0941'.
+> The response values should be `0x0941`.
 >
 > New Server:
-> The response values should be '0x0f41'.
+> The response values should be `0x0f41`.
 
-If the response is to not correct for any RDBEs, refer to [Setup of
-RDBEs from a cold start] in the appendix.
+If the response is to not correct for any RDBEs, refer to 
+[Setup of RDBEs from a cold start] in the appendix.
 
 Check Mark 6 Status
 -------------------
 
-From the Field System, check the Mark 6s
+From the Field System, check the Mark6s
 
 ```fs
 mk6=dts_id
@@ -86,34 +90,34 @@ mk6=dts_id
 
 You should receive a sensible response similar to
 
-!dts_id?0:Mark6-4605:1.0.24-1:1.2;
+    !dts_id?0:Mark6-4605:1.0.24-1:1.2;
 
 If the response is to not correct for any Mark6s, refer to [Set-up of
 Mark 6 server from a cold start] in the appendix.
 
 Check MCI Status
 ----------------
- 
->This is specific to GGAO.
+
+> This is specific to GGAO.
 >
 > You can test whether this is needed by using the FS SNAP procedure:
 >
->```fs
-> dewar
-> ```
+> 
+>     dewar
+> 
 
->This is specific to KPGO.
+> This is specific to KPGO.
 >
-> ```fs
-> cryo
->```
+> 
+>     cryo
+> 
 
 If it is working, you will see the readouts for the 20K and 70K stages.
 If not, see the [Setup MCI server] section in the appendix.
 
 
 Mount Mark 6 Modules
-====================
+--------------------
 
 This step is included just after initial verification that all the
 devices are working, but before the more detailed per-experiment
@@ -221,18 +225,18 @@ time
 
 This will dislay the the pps_offset, dot, and gps_offset:
 
-2016.320.18:11:39.28/rdbed/!dbe_pps_offset?0:-1.953124995e-08;
-2016.320.18:11:39.28/rdbec/!dbe_pps_offset?0:-1.953124995e-08;
-2016.320.18:11:39.29/rdbea/!dbe_pps_offset?0:-1.953124995e-08;
-2016.320.18:11:39.29/rdbeb/!dbe_pps_offset?0:-1.953124995e-08;
-2016.320.18:11:39.29/rdbeb/!dbe_dot?0:2016-320-18-11-39.296s:-0.007s:33;
-2016.320.18:11:39.29/rdbea/!dbe_dot?0:2016-320-18-11-39.296s:-0.018s:33;
-2016.320.18:11:39.29/rdbed/!dbe_dot?0:2016-320-18-11-39.296s:-0.024s:33;
-2016.320.18:11:39.29/rdbec/!dbe_dot?0:2016-320-18-11-39.296s:0.000s:33;
-2016.320.18:11:39.29/rdbeb/!dbe_gps_offset?0:-3.758203125e-05;
-2016.320.18:11:39.29/rdbed/!dbe_gps_offset?0:-3.758203125e-05;
-2016.320.18:11:39.29/rdbea/!dbe_gps_offset?0:-3.758203125e-05;
-2016.320.18:11:39.29/rdbec/!dbe_gps_offset?0:-3.758203125e-05;
+    2016.320.18:11:39.28/rdbed/!dbe_pps_offset?0:-1.953124995e-08;
+    2016.320.18:11:39.28/rdbec/!dbe_pps_offset?0:-1.953124995e-08;
+    2016.320.18:11:39.29/rdbea/!dbe_pps_offset?0:-1.953124995e-08;
+    2016.320.18:11:39.29/rdbeb/!dbe_pps_offset?0:-1.953124995e-08;
+    2016.320.18:11:39.29/rdbeb/!dbe_dot?0:2016-320-18-11-39.296s:-0.007s:33;
+    2016.320.18:11:39.29/rdbea/!dbe_dot?0:2016-320-18-11-39.296s:-0.018s:33;
+    2016.320.18:11:39.29/rdbed/!dbe_dot?0:2016-320-18-11-39.296s:-0.024s:33;
+    2016.320.18:11:39.29/rdbec/!dbe_dot?0:2016-320-18-11-39.296s:0.000s:33;
+    2016.320.18:11:39.29/rdbeb/!dbe_gps_offset?0:-3.758203125e-05;
+    2016.320.18:11:39.29/rdbed/!dbe_gps_offset?0:-3.758203125e-05;
+    2016.320.18:11:39.29/rdbea/!dbe_gps_offset?0:-3.758203125e-05;
+    2016.320.18:11:39.29/rdbec/!dbe_gps_offset?0:-3.758203125e-05;
 
 The offsets should be small (GPS typically ± a few tens of
 microseconds, PPS typically ± a few tens of nanoseconds) and the DOT
@@ -289,11 +293,11 @@ at time until it agrees with the FS time.
 > Mark 6 will not record a test scan when you make one (but there
 > could be other causes besides this one).  If this happens and you can
 > determine which RDBEs do not have the current nominal VDIF epoch set
-> its time explicity.  If you don't know which is wrong just set them
+> its time explicitly.  If you don't know which is wrong just set them
 > all explicitly. Use the procedure described above for after June 30
 > or December 31 to set the time(s).
  
-> For the new server, the displayed VDIF epoches must be the same. If
+> For the new server, the displayed VDIF epochs must be the same. If
 > they are not use the ';' command for each RDBE to set the epoch to
 > the nominal one.
 
@@ -1085,14 +1089,13 @@ Module conditioning
     further action is needed before an observation besides a
     test recording.
 
-Setup Field System PC
-=====================
+Setup Field System PC from Cold start
+-------------------------------------
 
 > This section is not complete
 
--   Start FS computer (if needed)
+-   Start FS computer
 -   Login as user `oper`
-
 -   Check NTP:
 
 ```tcsh
@@ -1113,18 +1116,17 @@ asterisk `*` in the first column. It may take a few minutes to get an `*`.
 -   Other local devices that use NTP (antenna, RDBE, Mark6, etc) can now
     be started
 
--   Start fs
+-   Start
 
 ```login_shell
 fs
 ```
 
 Setup of RDBEs from a cold start
-================================
+--------------------------------
 
-Power up RDBEs
--------------
-
+###Power up RDBEs
+ 
 Use the power switch to start or cycle the power of each RDBE to be started.
 
 > New server:
@@ -1137,8 +1139,8 @@ Use the power switch to start or cycle the power of each RDBE to be started.
 >
 > When the RDBEs respond with a status value `0x0f41`, skip to [Check/Set RDBE times]
 
-Start RDBE server
------------------
+###Start RDBE server
+
 
 From FS PC shell prompt, login to each RDBE:
 
@@ -1166,8 +1168,7 @@ rdbe_status
 There will be an error for each RDBE that is not ready. When all RDBEs
 respond with a status value `0x0941`, proceed to the next step.
 
-Load Firmware
--------------
+###Load Firmware
 
 To load the firmware on all RDBEs, use the FS command:
 
@@ -1197,8 +1198,7 @@ This time, the RDBEs should respond with status `0x0f01`
 
 When all status values reach the correct value, proceed to next step
 
-Configure RDBEs
----------------
+###Configure RDBEs
 
 To initialize the configuration on all RDBEs, use the FS command:
 
@@ -1216,8 +1216,7 @@ rdbe_init<id>
 
 You should get a "success" message.
 
-Check/Set RDBE times
---------------------
+###Check/Set RDBE times
 
 It is **necessary** to check/set the time with `fmset` for an RDBE
 **every time** it is restarted.  The time only needs to be set if it is
@@ -1245,29 +1244,25 @@ Be sure to exit with `<Escape>`.
 
 
 Set-up of Mark 6 server from a cold start
-=========================================
+-----------------------------------------
 
 Use the power switch to start or cycle the power of each Mark 6 to be started.
 
-> New server:
->
-> Check Mark 6 connection
-> -----------------------
->
-> From the Field System, check the Mark 6 connection
->
->```fs
->mk6=dts_id
->```
->
-> You should receive a sensible response similar to
->
->    !dts_id?0:Mark6-4605:1.0.24-1:1.2;
->
-> If so, you can skip the rest of this section.
+###Check Mark 6 connection (New server)
 
-Starting Mark 6 servers
------------------------
+From the Field System, check the Mark 6 connection
+
+``` {.fs}
+mk6=dts_id
+```
+
+You should receive a sensible response similar to
+
+    !dts_id?0:Mark6-4605:1.0.24-1:1.2;
+
+If so, you can skip the rest of this section.
+
+###Starting Mark 6 servers
 
 If you receive an error, check that the Mark 6 servers are running. The
 programs `cplane` and `dplane` need to be running on the Mark 6. These
@@ -1288,7 +1283,7 @@ If they are not, start them
 ```
 
 Setup MCI server
-================
+----------------
 
 >This is specific to GGAO.
 >
