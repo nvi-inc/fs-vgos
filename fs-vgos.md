@@ -2,181 +2,83 @@
 % KPGO
 % October 2016
 
-Setup Field System PC
-=====================
+These notes cover basic procedures for running VGOS experiment
+operations with the FS.  They are described in a logical order for the
+tasks that need to be completed.  If another order of operations make
+more sense for some locale that is fine of course.
 
-> This section is not complete
+A basic assumption is that all the equipment is already up and
+running.  The procedures check this and refer to the appendix for
+set-up instructions for a device if it isn't already running.  In
+addition to these setup procedures, the appendix also contains
+instructions for some other useful operations.
 
-> **EH:** Need FS start section: boot PC, auto-logged in (or manually) as
-> "oper", verify NTP sync'd, then start FS (anything else?). For KPGO
-> and GGAO, if antenna must be started, do it after NTP has sync'd on FS
-> computer. (what about other devices dependent on NTP?)
+As written here, the procedures are mostly station independent.
+However, some station dependencies are noted.  These only cover GGAO
+and KPGO for now but Westford can, and will, be added.  Some of the
+station dependencies can be removed by writting some additional
+scripts that hid the dependencies.  This is also a good idea because
+the scripts can reduce the complexity of the operations.
 
--   Start FS computer (if needed)
--   Login as user `oper`
+> **EH:** The etransfer instructions need to be checked.
 
--   Check NTP:
+DRUDG experiment files
+======================
+
+This step is first for two reasons.  First, the schedule file is
+typically available before the day of the experiment.  Secondly, the
+number of modules in a recording group may eventually depend on the
+experiment.  When that is the case, the number needed will conveyed
+through the listing that is made in this step.
+
+To create the station specific SNAP and procedure files from the session
+schedule, fetch the schedule from IVS and drudg it with
 
 ```tcsh
-ntpq -np
+fesh -d <sched>
 ```
+where `<sched>` is the schedule name, eg `v16033`.
 
-The output is of the form
+If you have manually received the schedule, follow the instructions in
+the [Manually processing schedules] section of the appendix.
 
-         remote           refid      st t when poll reach   delay   offset  jitter
-    ==============================================================================
-    *192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
-    +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
+Experiment set-up
+=================
 
-
-The offsets should be small and there must be a server with an
-asterisk `*` in the first column. It may take a few minutes to get an `*`.
-
-Setup of RDBE from a cold start
-===============================
-
-> **EH:** This section will change completely with the new server. It will
-boot to a state where the configuration step has finished. There will
-be a different status code to indicate success. It will just be
-necessary to sync after boot.
-
-Start RDBE server
+Start FS log file
 -----------------
 
-From FS PC shell prompt, login to each RDBE:
-
-```tcsh
-ssh root@rdbe<id>
-```
-
-> **EH:** All devices should be set-up so the operator can ssh into them
-> without providing a password. That isn't part of the procedure, but
-> maybe should be noted somewhere (other issues?).
-
-> **DH:** There are notes in the appendix for this
-
-use `<id>=a`, `b`, `c`, or `d` to log into RDBE-`<id>`.
-
-Then, on each RDBE run
-
-```tcsh
-rbin
-nohup ./rdbe_server 5000 6 &
-exit
-```
-
-Repeat this for each RDBE that has been restarted. You can verify when
-all the RDBEs have started from the FS with:
+In the FS, open the experiment log so the set-up will recorded in that
+log:
 
 ```fs
-rdbe_status
+log=<schedule><stn id> # eg v16033gs
 ```
 
-> **Chris**: Example of rdbe_status output for Kokee is "0:0x0941". We found
-that if this number is different than above system does not work
-properly so we note it in our procedure.
+Check RDBE Status
+-----------------
 
-There will be an error for each RDBE that is not ready. When all RDBEs
-respond with a status value `0x0e01`, proceed to the next step.
+New server:
 
-Load Firmware
--------------
-
-To load the firmware on all RDBEs, use the FS command:
+From the Field System, check the RDBEs
 
 ```fs
-rdbe_fpga
+rdbe_staus
 ```
 
-If you want to load the firmware individually for RDBE-`<id>`, you can
-use the FS command
+> Old Server:
+> The response values should be '0x0941'.
+>
+> New Server:
+> The response values should be '0x0f41'.
 
-```fs
-rdbe_fpga<id>
-```
+If the response is to not correct for any RDBEs, refer to [Setup of
+RDBEs from a cold start] in the appendix.
 
-Again, use `<id>=a`, `b`, `c`, or `d` as necessary.
+Check Mark 6 Status
+-------------------
 
-There will be an error for each RDBE, since it will not respond right
-away and will time-out. You verify when this is finished from the FS
-with again using
-
-```fs
-rdbe_status
-```
-
-This time, the RDBEs should respond with status `0x0f01`
-
-When all status values reach the correct value, proceed to step C.
-
-Configure RDBEs
----------------
-
-To initialize the configuration on all RDBEs, use the FS command:
-
-```fs
-rdbe_init
-```
-
-You should get four "success" messages.
-
-If you need initialize an RDBE individually use, the FS command
-
-```fs
-rdbe_init<id>
-```
-
-You should get a "success" message.
-
-Sync RDBEs
-----------
-
-It is **necessary** to sync and set the time with `fmset` for an RDBE
-**every time** it is restarted.
-
-(And also as soon as feasible after a December 31 and a June 30, before
-the first experiment after those dates at the latest.)
-
-To do this from the FS console, press `<Control><Shift>T` to start
-`fmset`, or type
-
-```tcsh
-fmset
-```
-
-in an FS PC shell.
-
-You can select the RDBE to set by letter: `a`, `b`, `c`, or `d`.
-
-With that RDBE's time being displayed, type `s` to sync it (and `y` to
-confirm), then type `.` (dot) to set the time to FS time.
-
-If the resulting displayed time is off by up to a few seconds, use `+`
-and/or `-` to increment and/or decrement the RDBE by a second at time
-until it agrees with the FS time.
-
-Be sure to exit with `<Escape>`.
-
-**After setting the time for each RDBE that needs it, repeat the
-[Configure RDBEs] step above for each RDBE that was set.**
-
-> If an experiment spans the end of a December 31 or a June 30 and any
-> RDBE gets its time reset after that but before the end of the
-> experiment, **all** the RDBEs must have their times reset before
-> recordings will work again.
-
-> **EH:** This will change with the new server/FS, which will display the
-VDIF epoch and FMSET will let you set it per RDBE. In that case, if
-one RDBE is rebooted after an epoch change (December 31 or June 30),
-that RDBE can be moved back to the previous epoch.
-
-Set-up of Mark 6 server from a cold start
-=====================================
-
-Check Mark 6 connection
------------------------
-
-From the Field System, check the Mark 6 connection
+From the Field System, check the Mark 6s
 
 ```fs
 mk6=dts_id
@@ -184,33 +86,40 @@ mk6=dts_id
 
 You should receive a sensible response similar to
 
-    !dts_id?0:Mark6-4605:1.0.24-1:1.2;
+!dts_id?0:Mark6-4605:1.0.24-1:1.2;
 
-Starting Mark 6 servers
------------------------
+If the response is to not correct for any Mark6s, refer to [Set-up of
+Mark 6 server from a cold start] in the appendix.
 
-If you receive an error, check that the Mark 6 servers are running. The
-programs `cplane` and `dplane` need to be running on the Mark 6. These
-should startup after boot.
+Check MCI Status
+----------------
+ 
+>This is specific to GGAO.
+>
+> You can test whether this is needed by using the FS SNAP procedure:
+>
+>```fs
+> dewar
+> ```
 
-To check check if they are running perform
+>This is specific to KPGO.
+>
+> ```fs
+> cryo
+>```
 
-```tcsh
-ssh root@mark6a
-ps aux | grep plane
-```
+If it is working, you will see the readouts for the 20K and 70K stages.
+If not, see the [Setup MCI server] section in the appendix.
 
-If they are not, start them
 
-```tcsh
-/etc/init.d/dplane start
-/etc/init.d/cplane start
-```
+Mount Mark 6 Modules
+====================
 
-> **Chris**: After setting up Mk6 server we would normally setup up our
-> disks modules at this point. We found that this is one of the more
-> likely problem areas while setting up so we like to set it up early in
-> the process to give time to resolve issues if needed.
+This step is included just after initial verification that all the
+devices are working, but before the more detailed per-experiment
+checks.  This allows any issues with getting the modules mounted
+resolved as soon as possible.  However, these steps can be done as
+part of the making the test recording if that is preferred.
 
 1.  This is to help with debugging, display and clear the Mark 6 message
     queue:
@@ -264,7 +173,7 @@ If they are not, start them
     mk6=mod_init=1:8:HAY%0001:sg:new
     ```
 
-    > **Note:** due to a current bug, the FS--Mark 6 connection will
+    > **Note:** due to a current incompatibility, the FS--Mark 6 connection will
     > timeout during long running commands such as this.
     >
     > Until this is fixed, you may want to run this command directly on
@@ -299,109 +208,104 @@ If they are not, start them
     Print out should have the group number at the end. If it is `-`,
     something has gone wrong.
 
-Setup MCI server
-================
-
->This is specific to GGAO.
-
-You can test whether this is needed by using the FS SNAP procedure:
-
-```fs
-dewar
-```
-
-If it is working, you will see the readouts for the 20K and 70K stages.
-If not, or if more MCI parameters are desired, use the following from a
-shell window, login to the MCI computer and run the MCI client
-
-```tcsh
-ssh mci
-./tcpip_client 192.168.1.51 10000
-```
-
-a prompt should come up. To display all the MCI data use the command
-
-    mci_data?
 
 
-If the server is not running, start it with
+Verify RDBE time, offsets, and VDIF epochs
+------------------------------------------
 
-```tcsh
-./startmciserver
-```
-
-> **Chris**: This section is completely different at KPGO currently so below
-the GGAO site specific procedures are KPGO procedures highlighted.
-
-> This is site specific to KPGO
-
-Log into the Hub PC in new Xterm window of FS
-
-     ssh oper@128.171.102.237
-     ps aux|grep mci (to see if mci server is running)
-     startmciserver (to start the server if not running)
-
-Log into the Backend PC in new Xterm window on FS
-
-    ssh oper@128.171.102.224
-    mci_client.py 128.171.102.237 5000 (opens mci client on backend pc)
-    mci_data? (displays all mci data points current state including dewar temperatures)
-
-DRUDG experiment files
-======================
-
-> **Chris**: we manually receive and process schedules as described in the
-appendix.
-
-To create the station specific SNAP and procedure files from the session
-schedule, fetch the schedule from IVS and drudg it with
-
-> **EH:** need to provide 'fesh' script, it will greatly simplify this step. Thanks.
-
-```tcsh
-fesh -d <sched>
-```
-
-where `<sched>` is the schedule name, eg `v16033`.
-
-If you have manually received the schedule, follow the instructions in
-the [Manually processing schedules] section of the appendix.
-
-Experiment set-up
-=================
-
-Start FS log file
------------------
-
-In the FS, open the experiment log so the set-up will recorded in that
-log:
-
-```fs
-log=<schedule><stn id> # eg v16033gs
-```
-
-Check RDBE time and offsets
----------------------------
-
-**Note:** if this is the first experiment since December 31 and June
-30, and the RDBEs have not had their time set since that epoch, reset
-the time each of RDBE according the [Sync RDBEs] step above. This must
-be done even if the time appears to be correct in the step below.
-
-In the FS, check RDBE time and offsets:
+In the FS, check RDBE time, offsets, and VDIF epochs:
 
 ```fs
 time
 ```
 
-The offsets should be small and the DOT times should be the same and the
-same as the FS log timestamps. If not, run `fmset` (`<Control><Shift>T`)
-and verify and set times by cycling through RDBEs (type each band
-letter: `a`, `b`, `c`, or `d`), and be sure to exit (`<Escape>`)
+This will dislay the the pps_offset, dot, and gps_offset:
 
-Don't use `s` for sync unless that RDBE had a PPS offset larger that
-±2e-8. **If you do sync, you must re-initialize that RDBE afterwards,
-following the [Configure RDBEs] step above.**
+2016.320.18:11:39.28/rdbed/!dbe_pps_offset?0:-1.953124995e-08;
+2016.320.18:11:39.28/rdbec/!dbe_pps_offset?0:-1.953124995e-08;
+2016.320.18:11:39.29/rdbea/!dbe_pps_offset?0:-1.953124995e-08;
+2016.320.18:11:39.29/rdbeb/!dbe_pps_offset?0:-1.953124995e-08;
+2016.320.18:11:39.29/rdbeb/!dbe_dot?0:2016-320-18-11-39.296s:-0.007s:33;
+2016.320.18:11:39.29/rdbea/!dbe_dot?0:2016-320-18-11-39.296s:-0.018s:33;
+2016.320.18:11:39.29/rdbed/!dbe_dot?0:2016-320-18-11-39.296s:-0.024s:33;
+2016.320.18:11:39.29/rdbec/!dbe_dot?0:2016-320-18-11-39.296s:0.000s:33;
+2016.320.18:11:39.29/rdbeb/!dbe_gps_offset?0:-3.758203125e-05;
+2016.320.18:11:39.29/rdbed/!dbe_gps_offset?0:-3.758203125e-05;
+2016.320.18:11:39.29/rdbea/!dbe_gps_offset?0:-3.758203125e-05;
+2016.320.18:11:39.29/rdbec/!dbe_gps_offset?0:-3.758203125e-05;
+
+The offsets should be small (GPS typically ± a few tens of
+microseconds, PPS typically ± a few tens of nanoseconds) and the DOT
+times should be the same the FS log timestamps, within a about 0.1
+seconds.  If the third field of 'dot' output is present (i.e., for the
+new server), all of the RDBEs must have the same value.
+
+If any of the DOT times are not correct, the ones that are wrong must
+be set with 'fmset'. To do this from the FS console, press
+`<Control><Shift>T` to start `fmset`, or type
+
+```tcsh
+fmset
+```
+
+in an FS PC shell.
+
+You can select the RDBE to set by letter: `a`, `b`, `c`, or `d`.
+
+With that RDBE's time being displayed, verify that the time is correct
+by comparing it to the FS/Computer time. If it is off by a lot, use
+"." to get it close, within a few seconds. Once it is close, you can
+use `+` and/or `-` to increment and/or decrement the RDBE by a second
+at time until it agrees with the FS time.
+
+> If this is the first experiment since December 31 and June
+> 30, and the RDBEs have not had their epoches reset since that date,
+> they should be reset.
+>
+> For the old server, this requires setting the time explicitly for
+> each RDBE with 'fmset' even if it looks correct.  Use at least one
+> of '.'. '+', '-'. or '=' commands and is necessary then verify/set
+> the time for each RDBE. The third field of the 'dot' output above
+> will be missing for the old server.
+>
+> For the new server, use the ';' command in 'fmset' for each RDBE to
+> set it to the nominal VDIF epoch. The third field in the 'dot'
+> output above must be the same for all the RDBEs.
+
+> **Note:** If the PPS offset is greater in magnitude than ±2e-7 
+> (subject to change) for an RDBE, it will need to be resync'd.
+>
+> For the old server, you will need to restart the RDBE, see [Setup of
+> RDBEs from a cold start] in the appendix.
+>
+> For the mew server, you can try using the 's' command in 'fmset' for
+> each RDBE that has too large an offset.  If that does not make the
+> offset small enough, restart the RDBE, see [Setup of RDBEs from a
+> cold start] in the appendix.
+
+> **Note:** The VDIF epochs of all the RDBEs must agree.
+>
+> For the old server, the only way to verify this is to note that the
+> Mark 6 will not record a test scan when you make one (but there
+> could be other causes besides this one).  If this happens and you can
+> determine which RDBEs do not have the current nominal VDIF epoch set
+> its time explicity.  If you don't know which is wrong just set them
+> all explicitly. Use the procedure described above for after June 30
+> or December 31 to set the time(s).
+ 
+> For the new server, the displayed VDIF epoches must be the same. If
+> they are not use the ';' command for each RDBE to set the epoch to
+> the nominal one.
+
+If any changes were necessary due to the above considerations, check
+the values again with:
+
+```fs
+time
+```
+
+to verify they are correct.  If not, follow the above instructions
+again.
 
 Initialize pointing
 -------------------
@@ -415,27 +319,28 @@ initp
 casa
 ```
 
+> This is KPGO specific:
+>
 > verify Az and El for source are acceptable
 >
 >     antenna=operate
 >
+> If not, try a different source first.
 
-> **Chris**: We normally do not have the antenna in operate mode until good
-Az and El positions are verified for the selected source
-
-
-The following sources are most reliable for these small antennas are:
+The following sources are the most reliable for these small antennas:
 
       Source Approximate L.S.T. of transit
   ---------- -------------------------------
-    Taurus A 05:30
-     Virgo A 12:30
-    Cygnus A 20:00
-       Cas A 23:30
+    Taurus A             05:30
+     Virgo A             12:30
+    Cygnus A             20:00
+       Cas A             23:30
 
-Local apparent sidereal time (L.A.S.T) is displayed in the antenna
-monitor window (monan) at GGAO and KPGO. Cas A is always up at GGAO and
-Westford but another source may be more appropriate at times.
+> This following information is site specific.
+>
+> Local apparent sidereal time (L.A.S.T) is displayed in the antenna
+> monitor window (monan) at GGAO and KPGO.  Cas A is always up at GGAO and
+> Westford but another source may be more appropriate at times.
 
 Set mode and attenuators
 ------------------------
@@ -448,51 +353,48 @@ proc=<schedule><stn id> # eg. 'v16033gs'
 setupbb
 ifdbb
 mk6bb
-auto                    # sets all attenuators three times
+auto                    # sets the attenuators
+proc=point
 ```
-
-> **EH:** with the new server/FS, the comment no longer applies, the command
-> is still "auto", but it only sets it once.
-
-Check the attenuation with
-
-```fs
-raw
-```
-
-The levels should all be ~32, and should not be higher than 40 or less than around 10.
 
 Check RDBEs
 -----------
 
 Locate the RDBE Monitor window or start it by pressing
-`<Control><Shift>6` or typing `monit6` in a shell. Noting that the
+`<Control><Shift>6` or typing `monit6` in a shell.  Noting that the
 display switches between IF0 and IF1 every second, check for each RDBE
 that:
 
 1.  DOT ticking and correct time
 
-2.  DOT2GPS value small (a few µs) and stable (varies by 0.1 µs or less)
+2.  For the new server, all RDBEs have the same epoch
 
-3.  RMS value close to 32
+3.  DOT2GPS value small (a few µs) and stable (varies by 0.1 µs or less)
 
-4.  Tsys IF0 and IF1 about 50-100, may be jumping a bit
+4.  RMS valuse close to 32 for the old server, 20 for the new
+    server. They be higher if the antenna has reached the source since
+    the "auto" command above.  They may be higher or lower if the
+    elevation has changed significantly since the "auto" or there is
+    variable RFI.
 
-5.  Phase-cal amplitude about 10-100, phase stable to within a few
+5.  Tsys IF0 and IF1 about 50-100, may be jumping a bit
+
+6.  Phase-cal amplitude about 10-100, phase stable to within a few
     degrees
 
 Leave the window open for later monitoring.
 
-Check multicast for all 4 bands in FS shell prompt:
-
-```tcsh
-mon<id>
-```
+> *EH:* Is this needed?
+>
+> Check multicast for all 4 bands in FS shell prompt:
+> 
+> ```tcsh
+> mon<id>
+> ```
 
 where `<id>=a, b, c, or d` (eg. `mona` etc.)
 
-
-> **Chris**: we would typically do this before pointing and test scan.
+Check RDBE data connectons
 
     rdbe=data_connect? (verifies that band a,b,c,and d equal 0,1,2,and 3)
 
@@ -506,10 +408,10 @@ FS command
 onsource
 ```
 
-The result should be `TRACKING`. If the antenna status is still
-`SLEWING` wait until you seen an on source message in the FS window.
+The result should be `TRACKING`.  If the antenna status is still
+`SLEWING` wait until you see an onsource message in the FS log window.
 
-Once the antenna is on source, start the pointing check with
+Once the antenna is onsource, start the pointing check with
 
 ```fs
 fivept
@@ -522,8 +424,8 @@ give you output in the form:
     xoffset   99.4469   30.8190   0.01417  -0.00806  0.00452  0.00801 1 1 01d0 virgoa
 
 The `xEl_offs` and `El_off` values (ie. the 3rd and 4th columns) are the
-offsets in sky coordinates of the pointing fit. The absolute value of
-these should be less that ~0.02 degrees in each coordinate. There
+offsets in sky coordinates of the pointing fit.  The absolute value of
+these should be less that ~0.02 degrees in each coordinate.  There
 should also be the flags `1 1` in the 3rd and 4th columns from the end.
 
 Next, measure the SEFDs on test source
@@ -532,7 +434,7 @@ Next, measure the SEFDs on test source
 onoff
 ```
 
-This will also take a few minutes. Once complete `onoff` will
+This will also take a few minutes.  Once complete `onoff` will
 give you output in the form:
 
         source       Az   El  De   I P   Center   Comp   Tsys  SEFD  Tcal(j) Tcal(r)
@@ -558,101 +460,29 @@ azeloff=0d,0d
 Make test recording
 -------------------
 
-> **Chris**: we normally would do the below two commands at this point to
-check the Mk6 inputs before doing test scan.
+1. Check Mark 6 inputs:
 
     mk6in             (checks data rates on Ethernet ports)
+
+    which will show the Gb/s by interface in the FS log. For example, a
+    rate of 2 Gb/s should should look like
+
+        #popen#mk6in/eth2 2.078 eth3 2.079 eth4 2.079 eth5 2.079 Gb/s
+
+    If one or more interfaces are not showing the approximate nominal
+    data rate (initially 2 Gb/s per interface), it is likely that the
+    corresponding RDBEs needs to be reconfigured.
+
     mk6=input_stream? (shows in more detail the Ethernet ports state for the Mk6)
+    Sample output:
 
-> **Chris**: At this point we normally have our disk modules setup and would
-move to step #3.
+mk6a/!input_stream?0:0:rdbeB:vdif:8224:42:66:eth3:127.0.0.1:12000:0:rdbeC:vdif:8224:42:66:eth4:127.0.0.1:12000:0:rdbeA:vdif:8224:42:66:eth2:127.0.0.1:12000:0:rdbeD:vdif:8224:42:66:eth5:127.0.0.1:12000:0;
 
-1.  This is to help with debugging, display and clear the Mark 6 message
-    queue:
+    which shows rdbeA going to eth2, rdbeB going to eth3, rdbeC going to
+    eth4, and rdbeD going to eth5.
 
-    ```fs
-    mk6=msg?
-    ```
-
-    If an unexplained error happens during the following procedure,
-    please use this command again to get more information.
-
-2.  Initialize module; create, mount, and open module
-
-    Check status:
-
-    ```fs
-    mk6=mstat?all
-    ```
-
-    After the two fields: return code and `cplane` status (hopefully
-    `mstat?0:0`) there are 10 fields per group:
-
-        group:slot:eMSN:#disks found:#disks nominal:free space:total space:status1:status2:type
-
-    It may be easier to read if individual groups are queried; eg. for
-    group 1:
-
-    ```fs
-    mk6=mstat?1
-    ```
-
-    If the module has already been initialized, ie `status1` is
-    `initialized`, and the data is no longer needed (**be certain**),
-    erase it:
-
-    ```fs
-    mk6=group=unprotect:<group>
-    mk6=group=erase:<group>
-    ```
-
-    If the module has not been initialized (`status1` is "unknown" and
-    no `eMSN`?), initialize it:
-
-    ```fs
-    mk6=mod_init=<slot#>:<#disks>:<MSN>:<type>:<new>
-    ```
-
-    For example
-
-    ```fs
-    mk6=mod_init=1:8:HAY%0001:sg:new
-    ```
-
-    > **Note:** due to a current bug, the FS--Mark 6 connection will
-    > timeout during long running commands such as this.
-    >
-    > Until this is fixed, you may want to run this command directly on
-    > the Mark 6 with
-    >
-    > ```tcsh
-    > ssh root@mark6a
-    > da_client
-    > mod_init=<slot#>:<#disks>:<MSN>:<type>:<new>;
-    > ```
-    >
-    > note the final semicolon is necesseary in `da_client` but is
-    > automatically added by the FS.
-
-    Create, open and mount the group:
-
-    ```fs
-    mk6=group=new:<slots>
-    mk6=group=mount:<slots>
-    mk6=group=open:<slots>
-    ```
-
-    (Slots is a list of slot numbers included in the group, without any
-    seperates eg `<slots>=12`)
-
-    To query if the group is created properly:
-
-    ```fs
-    mk6=group?;
-    ```
-
-    Print out should have the group number at the end. If it is `-`,
-    something has gone wrong.
+2. The modules and groups should have been set-up already.  If not refer
+   to [Mount Mark 6 Modules] above.
 
 3.  In FS, record some test data:
 
@@ -677,14 +507,17 @@ move to step #3.
     mk6in
     ```
 
+    as shown in step #1 above.
+
     which will show the Gb/s by interface in the FS log. For example, a
     rate of 2 Gb/s should should look like
 
         #popen#mk6in/eth2 2.078 eth3 2.079 eth4 2.079 eth5 2.079 Gb/s
 
-    If one or more interfaces are not showing the approximate nominal
-    data rate (initially 2 Gb/s per interface), it is likely that the
-    corresponding RDBEs needs to be reconfigured.
+    If all interfaces are receiving data at the correct rate, it may
+    be that the VDIF epochs of all the RDBEs don't agree.  See [Verify
+    RDBE time, offsets, and VDIF epochs] for detail on how to
+    verify/set.
 
     You can also check if the disk is full with
 
@@ -706,48 +539,28 @@ move to step #3.
 Start experiment
 ================
 
-> **EH:** This is not really to check mult-cast logging, but the data being
-> sent in multicast messages. MONIT6 demonstrates that multicast is
-> working. Maybe we can get rid of use the "monitor" program. To
-> be discussed with Chet. Comments on this (as well as everything else) from
-> sites would be helpful.
-
 Start non-FS multi-cast logging
 -------------------------------
 
-> **EH:** With Influx logging of data, maybe we can get rid of this logging,
-> once InfluxDB is installed.
+> **EH:** Once we have InfluxDB logging of data, maybe we can get rid of this logging,
 
-From a FS PC shell prompt, connect to the backend PC
+From a FS enter:
 
-```tcsh
-ssh backend-pc
+```fs
+start_mlog
 ```
 
-Start logging and exit:
-
-```tcsh
-start_multicast_logging
-exit
-```
+If there are no errors reported and the "Done" message is printed the
+logging has been started.
 
 Send "Ready" message
 --------------------
 
-From FS shell prompt, connect to monkey
+From FS console window enter Control-Shift-G.
 
-```tcsh
-ssh -X backend-pc
-cd bin
-python vgos-msg-gui.py
-```
-
-> **EH:** Different hosts at different sites of course, but
-> at KPGO I fixed this so `.fvwm2rc` short-cut Control-Shift-G starts it,
-> all the sites should get that. Jason will eventually move
-> `vgos-msg-gui.py` to the FS machines so we can have better
-> functionality. Maybe the placement of the window should be controlled
-> locally by `.Xresources`.
+> **EH:** Jason will eventually move `vgos-msg-gui.py` to the FS
+> machines so we can have better functionality. Maybe the placement of
+> the window should be controlled locally by `.Xresources`.
 
 At this point a GUI window should pop up. Enter the session name,
 station code (lower case) and select the type of message from the drop
@@ -780,16 +593,8 @@ Now, in the FS, start schedule:
 schedule=<session><stn id>,#<nnn>
 ```
 
-(**Note:** the pound sign (`#`) is required and there should be no space
+(**Note:** the pound sign (`#`) is required and there should be no spaces
 in the command)
-
-> **DH:** can you just do `schedule=<session><stn id>`? (does it find the
-> next scan after 5 min?)
-
-> **EH:** Well yes, if are more than five minutes from the start of
-> schedule, but sometimes we start in the middle. Is it better to have
-> one description that works for all situations or two different ones,
-> what do you think? Your choice.
 
 Send "Start" message
 --------------------
@@ -803,48 +608,41 @@ Monitor `scan_check`
 --------------------
 
 To display `scan_check` results as they come in (and the old ones so
-far) open a new window (`Control><Shift>W`) then
-
-```tcsh
-scan_check
-```
-
-(which does `` tail -f -n +1 /usr2/log/`lognm`.log| grep scan_check ``)
+far) open the 'scnch' window (`Control><Shift>K`).
 
 Results should show vdif, reasonable record start time, about equal
-seconds and GBs of data (typically 30+), and 8 Gbps data rate. Be aware
-`scan_checks` *occasionally* fails.
+seconds and GBs of data (typically 30+), and 8 Gbps data rate.  Be
+aware `scan_checks` *occasionally* fails and the data is okay.
 
 Position and size window for convenient viewing, new output will follow
 any changed size. You can stop this with `<Control>-C`
 
-> **EH:** I set up KPGO so that .fvwm2rc short-cut Control-Shift-K opens a
-> window with this output. The placement and size of the window is
-> controlled by .Xresources. I think everyone should get this if they
-> don't already have it.
+> **EH:** The placement and size of the window can be controlled by
+> .Xresources.
 
 Check RDBE Monitor
 ------------------
 
-Check the display for reasonable values:
+Check the display for reasonable values periodically:
 
 1.  DOT ticking and correct time
 
-> **EH:** new server/FS: and VDIF epoches for all RDBEs agree
+2.  New server VDIF epoches for all RDBEs agree
 
-2.  DOT2GPS value small (a few µseconds) and stable (varies by 0.1
+3.  DOT2GPS value small (a few µseconds) and stable (varies by 0.1
     µseconds or less)
 
-3.  RMS value close to 32 (note that the display switches between IF0
-    and IF1 every second).
+4.  While recording RMS values are close to 32 for old server and 20
+    for the new server, sometime RFI can cause the value to be off, but
+    it should always be between 10 and 40 (note that the display
+    switches between IF0 and IF1 every second).
 
-> **EH:** new server/FS: RMS value close to 20
+5.  Tsys IF0 and IF1 about 50-100 (may lower at Wf due to use of a
+    preliminary cal value), may be jumping a bit
 
-4.  Tsys IF0 and IF1 about 50-100, but may lower at Wf due to
-    preliminary cal value, may be jumping a bit
-
-5.  Phase-cal amplitude about 10-100, phase stable to within a few
-    degrees (note the display switches between IF0 and IF1 every second)
+6.  Phase-cal amplitude about 10-100, phase stable to within a few
+    degrees (note the display switches between IF0 and IF1 every
+    second)
 
 Post experiment
 ===============
@@ -861,50 +659,55 @@ schedule=
 Stop multicast logging
 ----------------------
 
-From a FS PC shell prompt, connect to the backend-pc
+In the FS, run
 
-```tcsh
-ssh backend-pc
-```
-
-then
-
-```tcsh
-stop_multicast_logging
-exit
+```fs
+stop_mlog
 ```
 
 
 Check pointing and SEFDs
 ------------------------
 
-If the FS *not* been restarted since the initial check, then the only set-up you will need is command the source (e.q. casa):
+Select procedure 'point' library
 
 ```fs
 proc=point
-initp
 ```
->**Chris:**
->    antenna=off (to allow us to verify Az and El for source before antenna moves)
 
-```
-casa
-```
->**Chris:** verify Az and El are acceptable
->    antenna=operate
-
-If the FS has been restarted since the initial setup, you will need to reset
-everything and send the antenna to an appropriate source (eg. casa)
+If the FS has been restarted since the initial check, you will need to
+re-initialize the pointing set-up
 
 ```fs
-proc=point
 initp
+```
+
+> Site Specific for KPGO:
+>
+>    antenna=off  (to allow verification of Az and El for source before antenna moves)
+
+Try Cas-A as a source:
+
+```fs
 casa
+```
+
+> Site Specific for KPGO:
+>
+> If necessary, try other sources from table in [Initialize pointing]
+> until one with a good position is found, then:
+>
+>    antenna=operate  (restart antenna)
+
+If you re-ran 'initp' above, you will need to restore the experiment set-up:
+
+```fs
 proc=<schedule><stn id> # eg. 'v16033gs'
 setupbb
 ifdbb
 mk6bb
 auto
+proc=point
 ```
 
 Wait until the antenna is on source. You can either watch the log or
@@ -922,7 +725,7 @@ As in the [Check pointing] section in pre-experiment, run a pointing check
 fivept
 ```
 
-and check the "xoffset" values are small. Then check the SEFDs
+and check the "xoffset" offset values are small. Then check the SEFDs
 
 ```fs
 onoff
@@ -936,10 +739,11 @@ Finally, zero the offsets
 azeloff=0d,0d
 ```
 
-> **Chris**: we would normally stow the antenna at this point and go to
-standby mode with drives off.
-
-> source=stow antenna=off
+> Site specific for KPGO:
+>
+> source=stow
+> (wait until stow is reached)
+> antenna=off
 
 Send "End" message
 ------------------
@@ -963,8 +767,8 @@ In a terminal, log in to the Mark 6
 > for different stations, maybe using something besides "gather", have
 > tried it at GGAO?
 
-> **DH:** I don't know enough about this. Maybe I need to ask Katie. Comments from other stations might
-> be needed here.
+> **DH:** I don't know enough about this. Maybe I need to ask
+> Katie. Comments from other stations might be needed here.
 
 ```tcsh
 ssh mark6a
@@ -973,7 +777,8 @@ dqa –d <filename>.vdif
 scp <filename>_*.vdif evlbi1.haystack.mit.edu:/data-st12/vgos/
 ```
 
-> **EH:**  Maybe put into a script, or something, to minimize typing? It is definitely too much typing
+> **EH:** Maybe put into a script, or something, to minimize typing?
+> As it is, it is definitely too much typing
 
 Remove the module for shipping
 ------------------------------
@@ -1083,10 +888,7 @@ turn keys off, remove modules
 Transfer log file
 -----------------
 
-> **Chris**: (We normally will have already completed this section prior to e-tranfer of test scan, manually like described in the appendix)
-
-
-> **Chris**: normally done before e-transfer of test scan.
+> This may be done before transferring the test scan.
 
 In FS, close experiment log:
 
@@ -1095,10 +897,6 @@ log=station
 ```
 
 In a terminal, copy the log to CDDIS and Haystack with
-
-> **EH:** need to provide 'plog' script, it will greatly simplify this step. Thanks.
-
-> **DH:** `plog` and `fesh` are in `fs-9.12.8/misc`
 
 ```tcsh
 plog <log file path> # eg /usr2/log/v16033gs.log
@@ -1148,12 +946,6 @@ ever takes your key, they can not gain access to your systems.
 This is a good idea for remote terminals, although is slightly more cumbersome for
 local access.
 
-> **EH:** This is *not* a good idea for oper account on FS machine.
-
-> **DH:** It requires a password to be entered once per login session (after `ssh-add`).
-> It seems like a good balance between security and convenience if a site is more
-> concerned. But probably not necessary for oper@pcfs.
-
 To encrypt your private key, enter a password when you generate it. To
 encrypt an old key, or change its password, use
 
@@ -1171,6 +963,8 @@ session to use it without a password.
 Setting Up Password-less Log Transfers
 --------------------------------------
 
+> *EH:* replace with new CDDIS transfer set-up procedure
+
 Currently we are using FTP to transfer log files to CDDIS.
 This is will change in the future. For now, add
 the following line to the `~/.netrc` file:
@@ -1179,9 +973,10 @@ the following line to the `~/.netrc` file:
 
 replacing the appropriate fields with your username and password.
 
-
 Manually uploading log files
 ----------------------------
+
+> *EH*: must be re-written for new CDDIS procedure
 
 In a terminal, copy the log to CDDIS
 
@@ -1241,9 +1036,8 @@ Schedule rotation
 
 6.  End DRUDG
 
-> **EH:** or reselect schedule (option #8)
-
-7.  Restart DRUDG with the new file to make the normal output
+7.  Restart DRUDG with the new file to make the normal output (or skip
+    step #6 reselect schedule, option #8)
 
 Module conditioning
 -------------------
@@ -1290,3 +1084,272 @@ Module conditioning
     reassign groups. If recording on all the modules simultaneously, no
     further action is needed before an observation besides a
     test recording.
+
+Setup Field System PC
+=====================
+
+> This section is not complete
+
+-   Start FS computer (if needed)
+-   Login as user `oper`
+
+-   Check NTP:
+
+```tcsh
+ntpq -np
+```
+
+The output is of the form
+
+         remote           refid      st t when poll reach   delay   offset  jitter
+    ==============================================================================
+    *192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
+    +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
+
+
+The offsets should be small and there must be a server with an
+asterisk `*` in the first column. It may take a few minutes to get an `*`.
+
+-   Other local devices that use NTP (antenna, RDBE, Mark6, etc) can now
+    be started
+
+-   Start fs
+
+```login_shell
+fs
+```
+
+Setup of RDBEs from a cold start
+================================
+
+Power up RDBEs
+-------------
+
+Use the power switch to start or cycle the power of each RDBE to be started.
+
+> New server:
+>
+> Check the status of all RDBEs with the FS command
+>
+> ```fs
+> rdbe_staus
+> ```
+>
+> When the RDBEs respond with a status value `0x0f41`, skip to [Check/Set RDBE times]
+
+Start RDBE server
+-----------------
+
+From FS PC shell prompt, login to each RDBE:
+
+```tcsh
+ssh root@rdbe<id>
+```
+
+use `<id>=a`, `b`, `c`, or `d` to log into RDBE-`<id>`.
+
+Then, on each RDBE run
+
+```tcsh
+rbin
+nohup ./rdbe_server 5000 6 &
+exit
+```
+
+Repeat this for each RDBE that has been restarted. You can verify when
+all the RDBEs have started from the FS with:
+
+```fs
+rdbe_status
+```
+
+There will be an error for each RDBE that is not ready. When all RDBEs
+respond with a status value `0x0941`, proceed to the next step.
+
+Load Firmware
+-------------
+
+To load the firmware on all RDBEs, use the FS command:
+
+```fs
+rdbe_fpga
+```
+
+If you want to load the firmware individually for RDBE-`<id>`, you can
+use the FS command
+
+```fs
+rdbe_fpga<id>
+```
+
+Again, use `<id>=a`, `b`, `c`, or `d` as necessary.
+
+There will be an error for each RDBE, since it will not respond right
+away and will time-out. You verify when this is finished from the FS
+with again using
+
+```fs
+rdbe_status
+```
+This time, the RDBEs should respond with status `0x0f01`
+
+> **EH:** is 0x0f01 correct?
+
+When all status values reach the correct value, proceed to next step
+
+Configure RDBEs
+---------------
+
+To initialize the configuration on all RDBEs, use the FS command:
+
+```fs
+rdbe_init
+```
+
+You should get four "success" messages.
+
+If you need initialize an RDBE individually use, the FS command
+
+```fs
+rdbe_init<id>
+```
+
+You should get a "success" message.
+
+Check/Set RDBE times
+--------------------
+
+It is **necessary** to check/set the time with `fmset` for an RDBE
+**every time** it is restarted.  The time only needs to be set if it is
+not correct already.
+
+To do this from the FS console, press `<Control><Shift>T` to start
+`fmset`, or type
+
+```tcsh
+fmset
+```
+
+in an FS PC shell.
+
+You can select the RDBE to set by letter: `a`, `b`, `c`, or `d`.
+
+With that RDBE's time being displayed, verify that the time is correct
+at the one second level (± a few tenths) by comparing it to the
+FS/Computer time.  If it is off by a lot, use "." to get it close,
+within a few seconds.  Once it is close, you can use `+` and/or `-` to
+increment and/or decrement the RDBE by a second at time until it
+agrees with the FS time.
+
+Be sure to exit with `<Escape>`.
+
+
+Set-up of Mark 6 server from a cold start
+=========================================
+
+Use the power switch to start or cycle the power of each Mark 6 to be started.
+
+> New server:
+>
+> Check Mark 6 connection
+> -----------------------
+>
+> From the Field System, check the Mark 6 connection
+>
+>```fs
+>mk6=dts_id
+>```
+>
+> You should receive a sensible response similar to
+>
+>    !dts_id?0:Mark6-4605:1.0.24-1:1.2;
+>
+> If so, you can skip the rest of this section.
+
+Starting Mark 6 servers
+-----------------------
+
+If you receive an error, check that the Mark 6 servers are running. The
+programs `cplane` and `dplane` need to be running on the Mark 6. These
+should startup after boot.
+
+To check check if they are running perform
+
+```tcsh
+ssh root@mark6a
+ps aux | grep plane
+```
+
+If they are not, start them
+
+```tcsh
+/etc/init.d/dplane start
+/etc/init.d/cplane start
+```
+
+Setup MCI server
+================
+
+>This is specific to GGAO.
+>
+> GGAO should be set-up agree with KPGO FS approach below.
+
+You can test whether this is needed by using the FS SNAP procedure:
+
+```fs
+dewar
+```
+
+If it is working, you will see the readouts for the 20K and 70K stages.
+If not, or if more MCI parameters are desired, use the following from a
+shell window, login to the MCI computer and run the MCI client
+
+```tcsh
+ssh mci
+./tcpip_client mci 10000
+```
+
+a prompt should come up. To display all the MCI data use the command
+
+    mci_data?
+
+If the server is not running, start it with
+
+```tcsh
+./startmciserver
+```
+
+> This is site specific to KPGO
+
+You can test whether this is needed by using the FS SNAP procedure:
+
+This is specific to KPGO.
+
+```fs
+ cryo
+```
+
+If it is working, you will see the readouts for the vaccum, 20K, and
+70K stages.  If not, start the server from the FS:
+
+ ```fs
+startmci
+```
+
+If 'cryo' still doesn't work, then use log into the Hub PC in new xterm window of FS
+
+     ssh oper@hubpc
+     ps aux|grep mci (to see if mci server is running)
+     startmciserver (to start the server if not running)
+
+To display more MCI date from the FS, enter:
+
+ ```fs
+mci_data
+```
+
+If that doesn't work, log into the Backend PC in new xterm window on FS
+
+    ssh oper@backend-pc
+    mci_client.py 128.171.102.237 5000 (opens mci client on backend pc)
+    mci_data? (displays all mci data points current state including dewar temperatures)
