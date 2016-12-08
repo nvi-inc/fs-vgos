@@ -10,6 +10,17 @@ all: pdf html docx
 # 		--number-sections \
 # 		-t context\
 # 		$< -o $@
+#
+
+%.tex: %.md header.tex
+	pandoc -H header.tex\
+		--toc \
+		--listings \
+		-V fontsize=12pt\
+		-V subparagraph \
+		-V verbatim-in-note \
+		--number-sections \
+		$< -o $@
 
 %.pdf: %.md header.tex
 	pandoc -H header.tex\
@@ -35,9 +46,11 @@ all: pdf html docx
 
 DOCX := $(patsubst %.md,%.docx,$(wildcard *.md))
 PDF := $(patsubst %.md,%.pdf,$(wildcard *.md))
+TEX := $(patsubst %.md,%.tex,$(wildcard *.md))
 HTML := $(patsubst %.md,%.html,$(wildcard *.md))
 SLIDES := $(patsubst %.md,%.html,$(wildcard *.md))
 
+tex: $(TEX)
 
 
 pdf: $(PDF)
