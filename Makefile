@@ -1,6 +1,9 @@
 all: pdf html docx
 .PHONY: all
 
+
+MDFLAGS = 
+
 %.docx: %.md
 	pandoc -S -o $@ $<
 	
@@ -15,6 +18,7 @@ all: pdf html docx
 %.tex: %.md header.tex
 	pandoc -H header.tex\
 		--toc \
+		--toc-depth=2 \
 		--listings \
 		-V fontsize=12pt\
 		-V subparagraph \
@@ -25,6 +29,7 @@ all: pdf html docx
 %.pdf: %.md header.tex
 	pandoc -H header.tex\
 		--toc \
+		--toc-depth=2 \
 		--listings \
 		--latex-engine=xelatex\
 		--latex-engine-opt '-shell-escape'\
