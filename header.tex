@@ -1,4 +1,5 @@
 \usepackage{fontspec}
+\usepackage{xcolor}
 \usepackage[compact]{titlesec}
 \renewcommand{\paragraph}[1]{\oldparagraph{#1} }
 \usepackage[top=0.5in, bottom=1in, left=1.0in, right=1.0in]{geometry}
@@ -9,6 +10,8 @@
 % \setmainfont[Mapping=tex-text]{TeX Gyre Pagella}
 % \setmainfont[Mapping=tex-text]{TeX Gyre Termes}
  
+\let\oldhyperlink\hyperlink
+\renewcommand{\hyperlink}[2]{{\bf \oldhyperlink{#1}{#2}}}
 \usepackage{setspace}
 \linespread{0.9}
 
@@ -21,12 +24,9 @@
 \let\oldquote=\quote
 \let\endoldquote=\endquote
 
-\usepackage{xcolor}
-
 \definecolor{bbb}{rgb}{0.148438,0.542969,0.820312}
 
-\hypersetup{colorlinks=true, linkcolor={bbb},
-}
+\hypersetup{colorlinks=true, linkcolor={bbb}, }
 % \urlstyle{same}
 %            pdfpagemode=FullScreen
 
@@ -35,9 +35,42 @@
 %             allbordercolors={0 0 0},
 %             pdfborderstyle={/S/U/W 1}}
 
+
+% \newtcolorbox{zitat}[1][]{%
+%     colback=block-gray,
+%     grow to right by=-10mm,
+%     grow to left by=-10mm, 
+%     boxrule=0pt,
+%     boxsep=0pt,
+%     enhanced jigsaw,
+%     borderline west={4pt}{0pt}{gray},
+%     colbacktitle={block-gray},
+%     coltitle={black},
+%     fonttitle={\large\bfseries},
+%     attach title to upper={},
+%     #1,
+% }
+% \renewenvironment{quote}{\begin{zitat}}{\end{zitat}}
+%
+
+% \renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm, borderline west={4pt}{0pt}{gray}]\begin{oldquote}}{\end{oldquote}\end{tcolorbox}}
+
 % \renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm, colframe=red!75!black,colback=white]}{\end{tcolorbox}}
 % \renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm, colframe=red!75!black,colback=white]}{\end{tcolorbox}}
+\tcbuselibrary{skins}
+\tcbuselibrary{breakable}
+\definecolor{gray1}{gray}{0.75}
+\definecolor{gray2}{gray}{0.95}
+\tcolorboxenvironment{quote}{%
+    blanker,
+    left skip=5mm, 
+    before skip=6pt,
+    after skip=6pt, 
+    borderline west={1mm}{0pt}{gray1},
+    colback={gray2},
+}
 % \renewenvironment{quote}{\begin{tcolorbox}[left skip=1cm, right skip=1cm]\begin{oldquote}}{\end{oldquote}\end{tcolorbox}}
+% \renewenvironment{quote}{\begin{tcolorbox}}{\end{tcolorbox}}
     % 
 
 % \usepackage{xargs} 
@@ -89,7 +122,6 @@
 %\renewenvironment{verbatim}{\begin{Shaded}\begin{Highlighting}}{\end{Highlighting}\end{Shaded}}
 %\renewenvironment{verbatim}{\VerbatimEnvironment\begin{Shaded}\begin{Verbatim}}{\end{Verbatim}\end{Shaded}}
 %\usepackage[cache=false]{minted}
-\usepackage{xcolor}
 
 \lstset{
     basicstyle=\ttfamily,
@@ -105,7 +137,7 @@
     showtabs=false,
     tabsize=4,
     captionpos=b,
-    breaklines=false,
+    breaklines=true,
     breakatwhitespace=false,
     breakautoindent=true,
     escapeinside={\%*}{*)},
