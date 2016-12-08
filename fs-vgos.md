@@ -1,10 +1,9 @@
-% VGOS Operations Notes
-% KPGO
-% October 2016
+% VGOS Operators Notes
+% December 2016
 
 These notes cover basic procedures for running VGOS experiment operations with
-the Field System (FS).  They are described in a logical order for the tasks
-that need to be completed.  If another order of operations make more sense for
+the Field System (FS). They are described in a logical order for the tasks
+that need to be completed. If another order of operations make more sense for
 some locale that is fine of course.
 
 A basic assumption is that all the equipment is already up and
@@ -14,9 +13,9 @@ addition to these setup procedures, the appendix also contains
 instructions for some other useful operations.
 
 As written here, the procedures are mostly station independent. However, some
-station dependencies are noted.  These only cover GGAO and KPGO for now but
-Westford can, and will, be added.  Some of the station dependencies can be
-removed by writing some additional scripts that hid the dependencies.  This is
+station dependencies are noted. These only cover GGAO and KPGO for now but
+Westford can, and will, be added. Some of the station dependencies can be
+removed by writing some additional scripts that hid the dependencies. This is
 also a good idea because the scripts can reduce the complexity of the
 operations.
 
@@ -42,11 +41,20 @@ the command
 fesh -d <sched>
 ```
 where `<sched>` is the schedule name, eg `v16033`.
-
-This will create the schedule for the FS to run, and
-
 If you have manually received the schedule, follow the instructions in
 the [Manually processing schedules] section of the appendix.
+
+Along with the `.snp` and `.prc` files for the FS, this
+will create the listings file `<sched><stn id>.lst` in `/usr2/sched`
+which shows a human readable summary of the schedule. Here `<stn id>` is
+the two letter station code, eg "gs" for GGAO. To view this
+on the FS PC, open in a text viewer; eg, in a FS shell
+
+```tcsh
+less /usr2/sched/`<sched><stn id>.lst`
+```
+Review the information in this listings file to ensure you have sufficient
+storage for the observation.
 
 Experiment setup
 ================
@@ -70,11 +78,10 @@ From the Field System, check the RDBEs
 rdbe_staus
 ```
 
+The response values should be `0x0f41`.
+
 > Old Server:
 > The response values should be `0x0941`.
->
-> New Server:
-> The response values should be `0x0f41`.
 
 If the response is to not correct for any RDBEs, refer to 
 [Setup of RDBEs from a cold start] in the appendix.
@@ -92,8 +99,8 @@ You should receive a sensible response similar to
 
     !dts_id?0:Mark6-4605:1.0.24-1:1.2;
 
-If the response is to not correct for any Mark6s, refer to [Set-up of
-Mark 6 server from a cold start] in the appendix.
+If the response is to not correct for any Mark6s, refer to 
+[Set-up of Mark 6 server from a cold start] in the appendix.
 
 Check MCI Status
 ----------------
@@ -201,7 +208,7 @@ part of the making the test recording if that is preferred.
     ```
 
     (Slots is a list of slot numbers included in the group, without any
-    seperates eg `<slots>=12`)
+    seperators, eg `<slots>=12`)
 
     To query if the group is created properly:
 
@@ -223,7 +230,7 @@ In the FS, check RDBE time, offsets, and VDIF epochs:
 time
 ```
 
-This will dislay the the pps_offset, dot, and gps_offset:
+This will display the `pps_offset`, `dot`, and `gps_offset`:
 
     2016.320.18:11:39.28/rdbed/!dbe_pps_offset?0:-1.953124995e-08;
     2016.320.18:11:39.28/rdbec/!dbe_pps_offset?0:-1.953124995e-08;
@@ -258,7 +265,7 @@ You can select the RDBE to set by letter: `a`, `b`, `c`, or `d`.
 
 With that RDBE's time being displayed, verify that the time is correct
 by comparing it to the FS/Computer time. If it is off by a lot, use
-"." to get it close, within a few seconds. Once it is close, you can
+"." to get it close --- within a few seconds. Once it is close, you can
 use `+` and/or `-` to increment and/or decrement the RDBE by a second
 at time until it agrees with the FS time.
 
@@ -296,7 +303,7 @@ at time until it agrees with the FS time.
 > its time explicitly.  If you don't know which is wrong just set them
 > all explicitly. Use the procedure described above for after June 30
 > or December 31 to set the time(s).
- 
+> 
 > For the new server, the displayed VDIF epochs must be the same. If
 > they are not use the ';' command for each RDBE to set the epoch to
 > the nominal one.
@@ -344,7 +351,7 @@ The following sources are the most reliable for these small antennas:
 >
 > Local apparent sidereal time (L.A.S.T) is displayed in the antenna
 > monitor window (monan) at GGAO and KPGO.  Cas A is always up at GGAO and
-> Westford but another source may be more appropriate at times.
+> Westford, but another source may be more appropriate at times.
 
 Set mode and attenuators
 ------------------------
@@ -395,12 +402,14 @@ Leave the window open for later monitoring.
 > ```tcsh
 > mon<id>
 > ```
-
-where `<id>=a, b, c, or d` (eg. `mona` etc.)
+>
+> where `<id>=a, b, c, or d` (eg. `mona` etc.)
 
 Check RDBE data connectons
 
-    rdbe=data_connect? (verifies that band a,b,c,and d equal 0,1,2,and 3)
+    rdbe=data_connect?
+
+and verify that band a,b,c,and d equal 0,1,2, and 3.
 
 Check pointing
 --------------
@@ -452,8 +461,7 @@ give you output in the form:
     VAL virgoa     170.9 63.0 15d1 8 r  10216.40 0.9870 53.64 3084.2  57.496  1.72
         source       Az   El  De   I P   Center   Comp   Tsys  SEFD  Tcal(j) Tcal(r)
 
-Verify SEFDs for eight bands are reasonable.
-They should be in the range ~2000-3000.
+Verify SEFDs for eight bands are reasonable. They should be in the range ~2000-3000.
 
 Finally, zero the offsets
 
@@ -464,9 +472,11 @@ azeloff=0d,0d
 Make test recording
 -------------------
 
-1. Check Mark 6 inputs:
+1. Check Mark 6 inputs with
 
-    mk6in             (checks data rates on Ethernet ports)
+    ```fs
+    mk6in
+    ```
 
     which will show the Gb/s by interface in the FS log. For example, a
     rate of 2 Gb/s should should look like
@@ -477,10 +487,15 @@ Make test recording
     data rate (initially 2 Gb/s per interface), it is likely that the
     corresponding RDBEs needs to be reconfigured.
 
-    mk6=input_stream? (shows in more detail the Ethernet ports state for the Mk6)
+    To see more details of the Ethernet ports state for the Mk6, use 
+
+    ```fs
+    mk6=input_stream? 
+    ```
+
     Sample output:
 
-mk6a/!input_stream?0:0:rdbeB:vdif:8224:42:66:eth3:127.0.0.1:12000:0:rdbeC:vdif:8224:42:66:eth4:127.0.0.1:12000:0:rdbeA:vdif:8224:42:66:eth2:127.0.0.1:12000:0:rdbeD:vdif:8224:42:66:eth5:127.0.0.1:12000:0;
+        mk6a/!input_stream?0:0:rdbeB:vdif:8224:42:66:eth3:127.0.0.1:12000:0:rdbeC:vdif:8224:42:66:eth4:127.0.0.1:12000:0:rdbeA:vdif:8224:42:66:eth2:127.0.0.1:12000:0:rdbeD:vdif:8224:42:66:eth5:127.0.0.1:12000:0;
 
     which shows rdbeA going to eth2, rdbeB going to eth3, rdbeC going to
     eth4, and rdbeD going to eth5.
@@ -771,9 +786,6 @@ In a terminal, log in to the Mark 6
 > for different stations, maybe using something besides "gather", have
 > tried it at GGAO?
 
-> **DH:** I don't know enough about this. Maybe I need to ask
-> Katie. Comments from other stations might be needed here.
-
 ```tcsh
 ssh mark6a
 gather /mnt/disks/<slot>/*/data/<filename>.vdif –o <filename>.vdif
@@ -1046,16 +1058,11 @@ Schedule rotation
 Module conditioning
 -------------------
 
-> **EH:** no experience myself, have you tested?
-
-> **DH:** These are Katie's notes, I haven't tested them.
-> it's almost worth
-
 1.  Load modules and enter da-client
 
         ssh mark6a da-client
 
-2.  In da-client, initialize the modules with the same `mod_init`
+2.  In `da-client`, initialize the modules with the same `mod_init`
     command used for experiment set up:
 
         mod_init=<slot#>:<#disks>:<MSN>:<type>:<new>;
@@ -1092,33 +1099,32 @@ Module conditioning
 Setup Field System PC from Cold start
 -------------------------------------
 
-> This section is not complete
 
 -   Start FS computer
 -   Login as user `oper`
--   Check NTP:
+-   Check NTP by running 
 
-```tcsh
-ntpq -np
-```
+    ```tcsh
+    ntpq -np
+    ```
 
-The output is of the form
+    The output is of the form
 
-         remote           refid      st t when poll reach   delay   offset  jitter
-    ==============================================================================
-    *192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
-    +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
+             remote           refid      st t when poll reach   delay   offset  jitter
+        ==============================================================================
+        *192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
+        +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
 
 
-The offsets should be small and there must be a server with an
-asterisk `*` in the first column. It may take a few minutes to get an `*`.
+    The offsets should be small and there must be a server with an
+    asterisk `*` in the first column. It may take a few minutes to get an `*`.
 
 -   Other local devices that use NTP (antenna, RDBE, Mark6, etc) can now
     be started
 
--   Start
+-   Start the Field System in the login shell
 
-```login_shell
+```tcsh
 fs
 ```
 
