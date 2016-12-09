@@ -1,6 +1,9 @@
 % VGOS Operators Notes
 % December 2016
 
+Introduction
+============
+
 These notes cover basic procedures for running VGOS experiment operations with
 the Field System (FS). They are described in a logical order for the tasks
 that need to be completed. If another order of operations make more sense for
@@ -51,8 +54,9 @@ the two letter station code, eg "gs" for GGAO. To view this
 on the FS PC, open in a text viewer; eg, in a FS shell
 
 ```tcsh
-less /usr2/sched/`<sched><stn id>.lst`
+less /usr2/sched/<sched><stn id>.lst
 ```
+
 Review the information in this listings file to ensure you have sufficient
 storage for the observation.
 
@@ -75,7 +79,7 @@ Check RDBE Status
 From the Field System, check the RDBEs
 
 ```fs
-rdbe_staus
+rdbe_status
 ```
 
 The response values should be `0x0f41`.
@@ -275,7 +279,7 @@ at time until it agrees with the FS time.
 >
 > For the old server, this requires setting the time explicitly for
 > each RDBE with 'fmset' even if it looks correct.  Use at least one
-> of '.'. '+', '-'. or '=' commands and is necessary then verify/set
+> of '.', '+', '-', or '=' commands and is necessary then verify/set
 > the time for each RDBE. The third field of the 'dot' output above
 > will be missing for the old server.
 >
@@ -646,7 +650,9 @@ Check the display for reasonable values periodically:
 
 1.  DOT ticking and correct time
 
-2.  New server VDIF epoches for all RDBEs agree
+2.  VDIF epoches for all RDBEs agree
+
+> NA for old server 
 
 3.  DOT2GPS value small (a few µseconds) and stable (varies by 0.1
     µseconds or less)
@@ -1330,10 +1336,10 @@ This is specific to KPGO.
  cryo
 ```
 
-If it is working, you will see the readouts for the vaccum, 20K, and
+If it is working, you will see the readouts for the vacuum, 20K, and
 70K stages.  If not, start the server from the FS:
 
- ```fs
+```fs
 startmci
 ```
 
@@ -1345,7 +1351,7 @@ If 'cryo' still doesn't work, then use log into the Hub PC in new xterm window o
 
 To display more MCI date from the FS, enter:
 
- ```fs
+```fs
 mci_data
 ```
 
