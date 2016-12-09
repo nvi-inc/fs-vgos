@@ -13,7 +13,7 @@
 \let\oldhyperlink\hyperlink
 \renewcommand{\hyperlink}[2]{{\bf \oldhyperlink{#1}{#2}}}
 \usepackage{setspace}
-\linespread{0.9}
+\linespread{0.85}
 
 \setmainfont[Mapping=tex-text]{Roboto}
 \setmonofont{Roboto Mono}
@@ -23,6 +23,9 @@
 % \usepackage{framed}
 \let\oldquote=\quote
 \let\endoldquote=\endquote
+
+% \setlength{\parskip}{1em}
+\renewenvironment{quote}{\oldquote\setlength{\parskip}{1em}}{\endoldquote}
 
 \definecolor{bbb}{rgb}{0.148438,0.542969,0.820312}
 
@@ -64,8 +67,8 @@
 \tcolorboxenvironment{quote}{%
     blanker,
     left skip=5mm, 
-    before skip=6pt,
-    after skip=6pt, 
+    before skip=1em,
+    after skip=1em, 
     borderline west={1mm}{0pt}{gray1},
     colback={gray2},
 }
