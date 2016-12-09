@@ -912,16 +912,23 @@ In FS, close experiment log:
 log=station
 ```
 
-In a terminal, copy the log to CDDIS and Haystack with
-
-```tcsh
-plog <log file path> # eg /usr2/log/v16033gs.log
-```
-
+In a terminal, copy the log to CDDIS and Haystack with `plog`.
 If you are transferring the most recent log you can use
 
 ```tcsh
 plog -l
+```
+
+Otherwise use
+
+```tcsh
+plot <session> # v16033
+```
+
+Or if the log file does not conform to the standard naming convention
+
+```tcsh
+plog <log file path> # eg /usr2/log/v16033gs.log
 ```
 
 If this is not successful, see [Manually uploading log files] in the appendix
@@ -1333,7 +1340,7 @@ This is specific to KPGO.
 If it is working, you will see the readouts for the vaccum, 20K, and
 70K stages.  If not, start the server from the FS:
 
- ```fs
+```fs
 startmci
 ```
 
@@ -1345,7 +1352,7 @@ If 'cryo' still doesn't work, then use log into the Hub PC in new xterm window o
 
 To display more MCI date from the FS, enter:
 
- ```fs
+```fs
 mci_data
 ```
 
