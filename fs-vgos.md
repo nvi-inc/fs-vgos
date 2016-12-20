@@ -131,7 +131,7 @@ Mount Mark 6 Modules
 --------------------
 
 This step is included just after initial verification that all the
-devices are working, but before the more detailed per-experiment
+devices are working, but before the more detailed pre-experiment
 checks.  This allows any issues with getting the modules mounted
 resolved as soon as possible.  However, these steps can be done as
 part of the making the test recording if that is preferred.
@@ -252,10 +252,12 @@ This will display the `pps_offset`, `dot`, and `gps_offset`:
 The offsets should be small (GPS typically ± a few tens of
 microseconds, PPS typically ± a few tens of nanoseconds) and the DOT
 times should be the same the FS log timestamps, within a about 0.1
-seconds.  If the third field of 'dot' output is present (i.e., for the
-new server), all of the RDBEs must have the same value.
+seconds.  The third field of 'dot' output is the VDIF epoch. All RDBEs must have
+the same value, (33 in this case).
 
-If any of the DOT times are not correct, the ones that are wrong must
+> For old server, the VDIF epoch not displayed
+
+**If any of the DOT times are not correct**, the ones that are wrong must
 be set with 'fmset'. To do this from the FS console, press
 `<Control><Shift>T` to start `fmset`, or type
 
@@ -273,33 +275,20 @@ by comparing it to the FS/Computer time. If it is off by a lot, use
 use `+` and/or `-` to increment and/or decrement the RDBE by a second
 at time until it agrees with the FS time.
 
-> If this is the first experiment since December 31 and June
-> 30, and the RDBEs have not had their epoches reset since that date,
-> they should be reset.
->
-> For the old server, this requires setting the time explicitly for
-> each RDBE with 'fmset' even if it looks correct.  Use at least one
-> of '.', '+', '-', or '=' commands and is necessary then verify/set
-> the time for each RDBE. The third field of the 'dot' output above
-> will be missing for the old server.
->
-> For the new server, use the ';' command in 'fmset' for each RDBE to
-> set it to the nominal VDIF epoch. The third field in the 'dot'
-> output above must be the same for all the RDBEs.
 
-> **Note:** If the PPS offset is greater in magnitude than ±2e-7 
-> (subject to change) for an RDBE, it will need to be resync'd.
->
-> For the old server, you will need to restart the RDBE, see [Setup of
-> RDBEs from a cold start] in the appendix.
->
-> For the mew server, you can try using the 's' command in 'fmset' for
-> each RDBE that has too large an offset.  If that does not make the
-> offset small enough, restart the RDBE, see [Setup of RDBEs from a
-> cold start] in the appendix.
+**If the PPS offset is greater in magnitude than ±2e-7** (subject to change) for an
+RDBE, it will need to be resync'd. You can try using the 's' command in 'fmset'
+for each RDBE that has too large an offset.  If that does not make the offset
+small enough, restart the RDBE, see [Setup of RDBEs from a cold start] in the
+appendix.
 
-> **Note:** The VDIF epochs of all the RDBEs must agree.
->
+> For the old server, you will need to restart the RDBE, see 
+> [Setup of RDBEs from a cold start] in the appendix.
+
+
+**If the displayed VDIF epochs are not the same,** use the ';' command for each
+RDBE to set the epoch to the nominal one.
+
 > For the old server, the only way to verify this is to note that the
 > Mark 6 will not record a test scan when you make one (but there
 > could be other causes besides this one).  If this happens and you can
@@ -308,9 +297,18 @@ at time until it agrees with the FS time.
 > all explicitly. Use the procedure described above for after June 30
 > or December 31 to set the time(s).
 > 
-> For the new server, the displayed VDIF epochs must be the same. If
-> they are not use the ';' command for each RDBE to set the epoch to
-> the nominal one.
+
+**If this is the first experiment since December 31 and June
+30,** and the RDBEs have not had their epoches reset since that date,
+they should be reset. Use the ';' command in 'fmset' for each RDBE to
+set it to the nominal VDIF epoch. The third field in the 'dot'
+output above must be the same for all the RDBEs.
+
+> For the old server, this requires setting the time explicitly for
+> each RDBE with 'fmset' even if it looks correct.  Use at least one
+> of '.', '+', '-', or '=' commands and is necessary then verify/set
+> the time for each RDBE. The third field of the 'dot' output above
+> will be missing for the old server.
 
 If any changes were necessary due to the above considerations, check
 the values again with:
@@ -382,15 +380,18 @@ that:
 
 1.  DOT ticking and correct time
 
-2.  For the new server, all RDBEs have the same epoch
+2.  All RDBEs have the same epoch
+
+    > Not applicable to old server
 
 3.  DOT2GPS value small (a few µs) and stable (varies by 0.1 µs or less)
 
-4.  RMS valuse close to 32 for the old server, 20 for the new
-    server. They be higher if the antenna has reached the source since
+4.  RMS values close to 20. They be higher if the antenna has reached the source since
     the "auto" command above.  They may be higher or lower if the
     elevation has changed significantly since the "auto" or there is
     variable RFI.
+
+    > Close to 32 for the old server. 
 
 5.  Tsys IF0 and IF1 about 50-100, may be jumping a bit
 
@@ -467,11 +468,12 @@ give you output in the form:
 
 Verify SEFDs for eight bands are reasonable. They should be in the range ~2000-3000.
 
-Finally, zero the offsets
+Finally, zero the offsets:
 
 ```fs
 azeloff=0d,0d
 ```
+(note there is no space between arguments)
 
 Make test recording
 -------------------
@@ -1153,7 +1155,7 @@ Use the power switch to start or cycle the power of each RDBE to be started.
 > Check the status of all RDBEs with the FS command
 >
 > ```fs
-> rdbe_staus
+> rdbe_status
 > ```
 >
 > When the RDBEs respond with a status value `0x0f41`, skip to [Check/Set RDBE times]
