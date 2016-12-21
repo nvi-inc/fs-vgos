@@ -250,10 +250,11 @@ This will display the `pps_offset`, `dot`, and `gps_offset`:
     2016.320.18:11:39.29/rdbec/!dbe_gps_offset?0:-3.758203125e-05;
 
 The offsets should be small (GPS typically ± a few tens of
-microseconds, PPS typically ± a few tens of nanoseconds) and the DOT
-times should be the same the FS log timestamps, within a about 0.1
-seconds.  The third field of 'dot' output is the VDIF epoch. All RDBEs must have
-the same value, (33 in this case).
+microseconds, PPS less than ±100 nanoseconds) and the DOT times should
+be the same the FS log timestamps, within a about 0.1 seconds.  The
+third field of 'dot' output is the VDIF epoch. All RDBEs must have the
+same value, (33 in this case).  The VDIF epochs of all RDBEs are also
+shown in the RDBE status window.
 
 > For old server, the VDIF epoch not displayed
 
@@ -275,16 +276,33 @@ by comparing it to the FS/Computer time. If it is off by a lot, use
 use `+` and/or `-` to increment and/or decrement the RDBE by a second
 at time until it agrees with the FS time.
 
+**If the PPS offset is greater in magnitude than ±1e-7 (100
+nanoseconds)** for an RDBE, it must be resync'd. You can try using the
+'s' command in 'fmset' for each RDBE that has too large an offset.
+This command will take approximately 45 seconds to complete.  If as a
+result, the PPS offset comes within the tolerance, please check that
+all the RDBEs are sending data with
 
-**If the PPS offset is greater in magnitude than ±2e-7** (subject to change) for an
-RDBE, it will need to be resync'd. You can try using the 's' command in 'fmset'
-for each RDBE that has too large an offset.  If that does not make the offset
-small enough, restart the RDBE, see [Setup of RDBEs from a cold start] in the
-appendix.
+```fs
+mk6in
+```
+
+If an interface is not showing receipt of data, reinitilize the
+correspond RDBE with:
+
+```fs
+rdbe_init<id>
+```
+
+where `<id>=a, b, c, or d` for the interface that is not recieving
+data, `eth2, eth3, eth4, or eth5` respectively.
+
+If this does not solve the data transmission problem. or the 's' did
+not make the offset small enough, restart the RDBE, see [Setup of
+RDBEs from a cold start] in the appendix.
 
 > For the old server, you will need to restart the RDBE, see 
 > [Setup of RDBEs from a cold start] in the appendix.
-
 
 **If the displayed VDIF epochs are not the same,** use the ';' command for each
 RDBE to set the epoch to the nominal one.
@@ -294,21 +312,22 @@ RDBE to set the epoch to the nominal one.
 > could be other causes besides this one).  If this happens and you can
 > determine which RDBEs do not have the current nominal VDIF epoch set
 > its time explicitly.  If you don't know which is wrong just set them
-> all explicitly. Use the procedure described above for after June 30
+> all explicitly. Use the procedure described below for after June 30
 > or December 31 to set the time(s).
-> 
 
-**If this is the first experiment since December 31 and June
-30,** and the RDBEs have not had their epoches reset since that date,
-they should be reset. Use the ';' command in 'fmset' for each RDBE to
-set it to the nominal VDIF epoch. The third field in the 'dot'
-output above must be the same for all the RDBEs.
+**If this is the first experiment since December 31 and June 30,** and
+the RDBEs have not had their epoches reset since that date, they
+should be reset. Use the ';' command in 'fmset' for each RDBE to set
+it to the nominal VDIF epoch. The third field in the 'dot' output
+above must be the same for all the RDBEs.  The VDIF epochs of all
+RDBEs are also shown in the RDBE status window.
 
 > For the old server, this requires setting the time explicitly for
 > each RDBE with 'fmset' even if it looks correct.  Use at least one
-> of '.', '+', '-', or '=' commands and is necessary then verify/set
-> the time for each RDBE. The third field of the 'dot' output above
-> will be missing for the old server.
+> of '.', '+', '-', or '=' commands and it is necessary then
+> verify/set the time for each RDBE. The third field of the 'dot'
+> output above will be missing for the old server and the VDIF epoch
+> will not be in the RDBE status window.
 
 If any changes were necessary due to the above considerations, check
 the values again with:
@@ -318,7 +337,7 @@ time
 ```
 
 to verify they are correct.  If not, follow the above instructions
-again.
+again and/or seek assistance.
 
 Initialize pointing
 -------------------
