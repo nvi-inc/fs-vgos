@@ -37,7 +37,7 @@ case, the number needed will conveyed through the listing that is made in this
 step.
 
 To create the station specific SNAP and procedure files from the session
-schedule, fetch the schedule from IVS and drudg by entering, in a FS PC shell,
+schedule, fetch the schedule from IVS and DRUDG it by entering, in a FS PC shell,
 the command
 
 ```tcsh
@@ -62,6 +62,27 @@ storage for the observation.
 
 Experiment setup
 ================
+
+Verify NTP is sync'd
+--------------------
+
+In the FS enter:
+
+```fs
+ntp_check
+```
+
+The output is of the form
+
+             remote           refid      st t when poll reach   delay   offset  jitter
+        ==============================================================================
+        *192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
+        +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
+
+
+The offsets should be small and there must be a server with an
+asterisk `*` in the first column. It may take a few minutes to get an `*`.
+
 
 Start FS log file
 -----------------
@@ -96,7 +117,7 @@ Check Mark 6 Status
 From the Field System, check the Mark6s
 
 ```fs
-mk6=dts_id
+mk6=dts_id?
 ```
 
 You should receive a sensible response similar to
@@ -123,8 +144,9 @@ Check MCI Status
 >     cryo
 > 
 
-If it is working, you will see the readouts for the 20K and 70K stages.
-If not, see the [Setup MCI server] section in the appendix.
+If it is working, you will see the readouts for the vacuum pressure
+and 20K and 70K stages.  If not, see the [Setup MCI server] section in
+the appendix.
 
 
 Mount Mark 6 Modules
@@ -134,7 +156,8 @@ This step is included just after initial verification that all the
 devices are working, but before the more detailed pre-experiment
 checks.  This allows any issues with getting the modules mounted
 resolved as soon as possible.  However, these steps can be done as
-part of the making the test recording if that is preferred.
+part of the making the test recording if that is preferred.  All
+commands are entered into the FS unless otherwise noted.
 
 1.  This is to help with debugging, display and clear the Mark 6 message
     queue:
@@ -167,7 +190,7 @@ part of the making the test recording if that is preferred.
     ```
 
     If the module has already been initialized, ie `status1` is
-    `initialized`, and the data is no longer needed (**be certain**),
+    `initialized`, and the data is no longer needed (**be certain first**),
     erase it:
 
     ```fs
@@ -191,8 +214,8 @@ part of the making the test recording if that is preferred.
     > **Note:** due to a current incompatibility, the FS--Mark 6 connection will
     > timeout during long running commands such as this.
     >
-    > Until this is fixed, you may want to run this command directly on
-    > the Mark 6 with
+    > Until this is fixed, you can optionally run this command directly on
+    > the Mark 6 from a shell prompt with
     >
     > ```tcsh
     > ssh root@mark6a
@@ -217,7 +240,7 @@ part of the making the test recording if that is preferred.
     To query if the group is created properly:
 
     ```fs
-    mk6=group?;
+    mk6=group?
     ```
 
     Print out should have the group number at the end. If it is `-`,
@@ -256,7 +279,7 @@ third field of 'dot' output is the VDIF epoch. All RDBEs must have the
 same value, (33 in this case).  The VDIF epochs of all RDBEs are also
 shown in the RDBE status window.
 
-> For old server, the VDIF epoch not displayed
+> For old server, the VDIF epochs are not displayed
 
 **If any of the DOT times are not correct**, the ones that are wrong must
 be set with 'fmset'. To do this from the FS console, press
@@ -272,23 +295,23 @@ You can select the RDBE to set by letter: `a`, `b`, `c`, or `d`.
 
 With that RDBE's time being displayed, verify that the time is correct
 by comparing it to the FS/Computer time. If it is off by a lot, use
-"." to get it close --- within a few seconds. Once it is close, you can
-use `+` and/or `-` to increment and/or decrement the RDBE by a second
+'`.`' to get it close --- within a few seconds. Once it is close, you can
+use '`+`' and/or '`-`' to increment and/or decrement the RDBE by a second
 at time until it agrees with the FS time.
 
-**If the PPS offset is greater in magnitude than ±1e-7 (100
+**If the PPS offset is greater in magnitude than ±1e-7 (±100
 nanoseconds)** for an RDBE, it must be resync'd. You can try using the
 's' command in 'fmset' for each RDBE that has too large an offset.
-This command will take approximately 45 seconds to complete.  If as a
-result, the PPS offset comes within the tolerance, please check that
-all the RDBEs are sending data with
+This command will take approximately 45 seconds per RDBE to complete.
+If as a result, the PPS offset comes within the tolerance, please
+check that all the RDBEs are sending data with
 
 ```fs
 mk6in
 ```
 
 If an interface is not showing receipt of data, reinitilize the
-correspond RDBE with:
+corresponding RDBE with:
 
 ```fs
 rdbe_init<id>
@@ -301,11 +324,12 @@ If this does not solve the data transmission problem. or the 's' did
 not make the offset small enough, restart the RDBE, see [Setup of
 RDBEs from a cold start] in the appendix.
 
-> For the old server, you will need to restart the RDBE, see 
-> [Setup of RDBEs from a cold start] in the appendix.
+> For the old server if the PPS offset is too large, you will need to
+> restart the RDBE to re-sync, see [Setup of RDBEs from a cold start]
+> in the appendix.
 
-**If the displayed VDIF epochs are not the same,** use the `';'` command for each
-RDBE to set the epoch to the nominal one.
+**If the displayed VDIF epochs are not the same,** use the '`;`'
+command for each RDBE to set the epoch to the nominal one.
 
 > For the old server, the only way to verify this is to note that the
 > Mark 6 will not record a test scan when you make one (but there
@@ -317,14 +341,14 @@ RDBE to set the epoch to the nominal one.
 
 **If this is the first experiment since December 31 and June 30,** and
 the RDBEs have not had their epoches reset since that date, they
-should be reset. Use the `';'` command in 'fmset' for each RDBE to set
+should be reset. Use the '`;`' command in 'fmset' for each RDBE to set
 it to the nominal VDIF epoch. The third field in the 'dot' output
 above must be the same for all the RDBEs.  The VDIF epochs of all
 RDBEs are also shown in the RDBE status window.
 
 > For the old server, this requires setting the time explicitly for
 > each RDBE with 'fmset' even if it looks correct.  Use at least one
-> of '.', '+', '-', or '=' commands and it is necessary then
+> of '`.`', '`+`', '`-`', or '`=`' commands and then it is necessary to
 > verify/set the time for each RDBE. The third field of the 'dot'
 > output above will be missing for the old server and the VDIF epoch
 > will not be in the RDBE status window.
@@ -392,10 +416,9 @@ proc=point
 Check RDBEs
 -----------
 
-Locate the RDBE Monitor window or start it by pressing
-`<Control><Shift>6` or typing `monit6` in a shell.  Noting that the
-display switches between IF0 and IF1 every second, check for each RDBE
-that:
+Locate the RDBE Monitor window (momnit6) or start it by pressing
+`<Control><Shift>6`.  Noting that for some fields the display switches
+between IF0 and IF1 every second, check for each RDBE that:
 
 1.  DOT ticking and correct time
 
@@ -403,14 +426,14 @@ that:
 
     > Not applicable to old server
 
-3.  DOT2GPS value small (a few µs) and stable (varies by 0.1 µs or less)
+3.  DOT2GPS value small (±a few µs) and stable (varies by 0.1 µs or less)
 
-4.  RMS values close to 20. They be higher if the antenna has reached the source since
-    the "auto" command above.  They may be higher or lower if the
-    elevation has changed significantly since the "auto" or there is
-    variable RFI.
+4.  RMS values close to 20. They may be higher if the antenna has
+    reached the source since the "auto" command above.  They may be
+    higher or lower if the elevation has changed significantly since
+    the "auto" or there is variable RFI.
 
-    > Close to 32 for the old server. 
+    > For the old server, RMS values close to 32.
 
 5.  Tsys IF0 and IF1 about 50-100, may be jumping a bit
 
@@ -419,7 +442,7 @@ that:
 
 Leave the window open for later monitoring.
 
-> *EH:* Is this needed?
+> *EH:* Is this still needed?
 >
 > Check multicast for all 4 bands in FS shell prompt:
 > 
@@ -433,20 +456,21 @@ Check RDBE data connectons
 
     rdbe=data_connect?
 
-and verify that band a,b,c,and d equal 0,1,2, and 3.
+and verify that band a,b,c,and d equal 0,1,2, and 3, respectively.
 
 Check pointing
 --------------
 
-Check is the antenna is now on the source we selected earlier with the
-FS command
+Check that the antenna is now on the source we selected earlier with
+the FS command
 
 ```fs
 onsource
 ```
 
 The result should be `TRACKING`.  If the antenna status is still
-`SLEWING` wait until you see an onsource message in the FS log window.
+`SLEWING` wait until you see an onsource message in the FS log window
+or `onsource' imdicates tracking.
 
 Once the antenna is onsource, start the pointing check with
 
@@ -461,9 +485,9 @@ give you output in the form:
     xoffset   99.4469   30.8190   0.01417  -0.00806  0.00452  0.00801 1 1 01d0 virgoa
 
 The `xEl_offs` and `El_off` values (ie. the 3rd and 4th columns) are the
-offsets in sky coordinates of the pointing fit.  The absolute value of
+beam spaces offsets of the pointing fit.  The absolute value of
 these should be less that ~0.02 degrees in each coordinate.  There
-should also be the flags `1 1` in the 3rd and 4th columns from the end.
+should also be the flags '`1 1`' in the 3rd and 4th columns from the end.
 
 Next, measure the SEFDs on test source
 
@@ -531,14 +555,14 @@ Make test recording
 3.  In FS, record some test data:
 
     ```fs
-    mk6=record=on:30:30;
+    mk6=record=on:30:30
     ```
 
     verify that lights on the mk6 flash appropriately. You can check
     recording status with:
 
     ```fs
-    mk6=record?;
+    mk6=record?
     ```
 
     It should progress starting as "recording", then transitioning
@@ -552,11 +576,6 @@ Make test recording
     ```
 
     as shown in step #1 above.
-
-    which will show the Gb/s by interface in the FS log. For example, a
-    rate of 2 Gb/s should should look like
-
-        #popen#mk6in/eth2 2.078 eth3 2.079 eth4 2.079 eth5 2.079 Gb/s
 
     If all interfaces are receiving data at the correct rate, it may
     be that the VDIF epochs of all the RDBEs don't agree.  See [Verify
@@ -572,11 +591,11 @@ Make test recording
 4.  Once recording ends, check quality:
 
     ```fs
-    mk6=scan_check?;
+    mk6=scan_check?
     ```
 
     Results should show vdif, the time when recording was started, 30
-    seconds of data, 30 GB of data and 8 Gbps data rate.
+    seconds of data, 30 GB of data with an 8 Gbps data rate.
 
     > **EH:** data rate will eventually go to 16 and 32 Gbps.
 
@@ -588,7 +607,7 @@ Start non-FS multi-cast logging
 
 > **EH:** Once we have InfluxDB logging of data, maybe we can get rid of this logging,
 
-From a FS enter:
+From the FS enter:
 
 ```fs
 start_mlog
@@ -626,8 +645,8 @@ down list.
 Start schedule
 --------------
 
-In FS Linux shell (xterm), look at the list file
-`<schedule><stn id>.lst` created in the DRUDG step (eg. `v16033gs.lst`). Find the
+In a Linux shell (xterm), look at the list file `<schedule><stn
+id>.lst` created in the DRUDG step (eg. `v16033gs.lst`). Find the
 first observation and note line number 'nnn' after scan name at start
 of line.
 
@@ -667,28 +686,31 @@ any changed size. You can stop this with `<Control>-C`
 Check RDBE Monitor
 ------------------
 
-Check the display for reasonable values periodically:
+Check the display for reasonable values periodically, note some fields
+alternater between IF0 and IF1 every second:
 
 1.  DOT ticking and correct time
 
-2.  VDIF epoches for all RDBEs agree
+2.  VDIF epoches for all RDBEs agree, if there is any disagreement some
+    will be in inverse video
 
-> NA for old server 
+> For old server, not applicable.
 
-3.  DOT2GPS value small (a few µseconds) and stable (varies by 0.1
+3.  DOT2GPS value small (±a few µseconds) and stable (varies by 0.1
     µseconds or less)
 
-4.  While recording RMS values are close to 32 for old server and 20
-    for the new server, sometime RFI can cause the value to be off, but
-    it should always be between 10 and 40 (note that the display
-    switches between IF0 and IF1 every second).
+4.  While *recording* RMS values are close to 20 for the new server,
+    sometime RFI can cause the value to be off, but it should always
+    be between 10 and 40 during recording.  If valeus are outside the
+    nominal ragnget they will be shown in inverse video.
+
+> For the old server, RMS values close to 32 and inverse video is not used.
 
 5.  Tsys IF0 and IF1 about 50-100 (may lower at Wf due to use of a
     preliminary cal value), may be jumping a bit
 
 6.  Phase-cal amplitude about 10-100, phase stable to within a few
-    degrees (note the display switches between IF0 and IF1 every
-    second)
+    degrees.
 
 Post experiment
 ===============
@@ -851,7 +873,7 @@ or experiment.
 
 turn keys off, remove module(s)
 
-    mk6=mstat?all;
+    mk6=mstat?all
 
 (to clear module info and check the modules are unmounted)
 
@@ -924,7 +946,7 @@ From da-client unmount the disk and prepare for shipping
 
 turn keys off, remove modules
 
-    mk6=mstat?all;
+    mk6=mstat?all
 
 (clears module info and checks the modules are unmounted)
 
@@ -976,7 +998,7 @@ Accept the defaults and enter a blank password when prompted.
 
 For each computer you want to enable password-less login, append your public
 key to `.ssh/authorized_keys` on the remote host. On a recent versions of the
-Field System OS (ie FSL9 based on Debian Wheezy) use the command
+Field System OS (i.e., FSL9 based on Debian Wheezy) use the command (use the target host node name or IP address in place of $host):
 
     ssh-copy-id $host
 
@@ -984,11 +1006,14 @@ If this is not available use
 
     cat ~/.ssh/id_rsa.pub | ssh $host 'cat >> ~/.ssh/authorized_keys'
 
-If you do not wish to have *completely* password-less login, an alternative
-is to encrypt your ssh key with a password and use ssh-agent to unlock it
-for your session. The upshot is you still have the convenience of
-password-less login, you just have to enter your password **once**
-after you login to the FS computer.
+If you do not wish to have *completely* password-less login, an
+alternative is to encrypt your ssh key with a password and use
+ssh-agent to unlock it for your session. The upshot is you still have
+the convenience of password-less login, you just have to enter your
+password **once** after you login to the FS computer.  However this is
+not recommended for devices that FS procedures use ssh to connect to,
+including, RDBEs, Mark 6s, MCI, and backend-PCs, which will need to
+have no prompt for smooth operations.
 
 This is also more secure since the ssh key is encrypted on disk and if anyone
 ever takes your key, they can not gain access to your systems.
@@ -1013,7 +1038,7 @@ session to use it without a password.
 Setting Up Password-less Log Transfers
 --------------------------------------
 
-> *EH:* replace with new CDDIS transfer set-up procedure
+> *EH:* replace with new CDDIS transfer set-up procedure, use URL reference
 
 Currently we are using FTP to transfer log files to CDDIS.
 This is will change in the future. For now, add
@@ -1293,7 +1318,7 @@ Use the power switch to start or cycle the power of each Mark 6 to be started.
 From the Field System, check the Mark 6 connection
 
 ``` {.fs}
-mk6=dts_id
+mk6=dts_id?
 ```
 
 You should receive a sensible response similar to
@@ -1388,3 +1413,41 @@ If that doesn't work, log into the Backend PC in new xterm window on FS
     ssh oper@backend-pc
     mci_client.py 128.171.102.237 5000 (opens mci client on backend pc)
     mci_data? (displays all mci data points current state including dewar temperatures)
+
+Connecting RDBE IF inputs
+-------------------------
+
+To avoid possibly overloading, and damaging, the RDBE
+analog-to-digital (A2D) converters used to sample the signal, it is
+recommended to make sure that the attenuators are at the maximum
+setting (31.5)c when connecting cables to the IF inputs. Use the
+command:
+
+````fs
+rdbe_attenX=<if>,31.5
+````
+
+where:
+
+   '`X`' is the RDBE '`a`', '`b`', '`c`', '`d`' or null for all.
+   '`<if>`' is the IF channel '`0`', '`1`', or '`both`' (or null) for both
+
+for example to set IF1 attenuator for RDBE-B to the maximum use:
+
+````fs
+rdbe_attenb=1,31.5
+````
+
+to set both IF attenuators for RDBE-C to the maximum use:
+
+````fs
+rdbe_attenc=,31.5
+````
+
+or to set all IF attenuators for all RDBEs to the maximum, use:
+
+````fs
+rdbe_atten=,31.5
+````
+
+
