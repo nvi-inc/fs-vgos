@@ -304,7 +304,7 @@ RDBEs from a cold start] in the appendix.
 > For the old server, you will need to restart the RDBE, see 
 > [Setup of RDBEs from a cold start] in the appendix.
 
-**If the displayed VDIF epochs are not the same,** use the ';' command for each
+**If the displayed VDIF epochs are not the same,** use the `';'` command for each
 RDBE to set the epoch to the nominal one.
 
 > For the old server, the only way to verify this is to note that the
@@ -317,7 +317,7 @@ RDBE to set the epoch to the nominal one.
 
 **If this is the first experiment since December 31 and June 30,** and
 the RDBEs have not had their epoches reset since that date, they
-should be reset. Use the ';' command in 'fmset' for each RDBE to set
+should be reset. Use the `';'` command in 'fmset' for each RDBE to set
 it to the nominal VDIF epoch. The third field in the 'dot' output
 above must be the same for all the RDBEs.  The VDIF epochs of all
 RDBEs are also shown in the RDBE status window.
