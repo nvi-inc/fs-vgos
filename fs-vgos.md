@@ -1,5 +1,5 @@
 % VGOS Operators Notes
-% December 2016
+% January 2017
 
 Introduction
 ============
@@ -74,10 +74,10 @@ ntp_check
 
 The output is of the form
 
-             remote           refid      st t when poll reach   delay   offset  jitter
-        ==============================================================================
-        *192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
-        +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
+         remote           refid      st t when poll reach   delay   offset  jitter
+    ==============================================================================
+    *192.168.1.20    18.26.4.105      2 u  444 1024  377    0.208   -0.336   0.396
+    +192.168.1.21    18.26.4.105      2 u  167 1024  377    0.215   -0.822   0.153
 
 
 The offsets should be small and there must be a server with an
@@ -446,9 +446,7 @@ Leave the window open for later monitoring.
 >
 > Check multicast for all 4 bands in FS shell prompt:
 > 
-> ```tcsh
-> mon<id>
-> ```
+>     mon<id>
 >
 > where `<id>=a, b, c, or d` (eg. `mona` etc.)
 
@@ -470,7 +468,7 @@ onsource
 
 The result should be `TRACKING`.  If the antenna status is still
 `SLEWING` wait until you see an onsource message in the FS log window
-or `onsource' imdicates tracking.
+or `onsource` indicates tracking.
 
 Once the antenna is onsource, start the pointing check with
 
@@ -484,10 +482,10 @@ give you output in the form:
               Az        El        xEl_offs  El_offs
     xoffset   99.4469   30.8190   0.01417  -0.00806  0.00452  0.00801 1 1 01d0 virgoa
 
-The `xEl_offs` and `El_off` values (ie. the 3rd and 4th columns) are the
-beam spaces offsets of the pointing fit.  The absolute value of
-these should be less that ~0.02 degrees in each coordinate.  There
-should also be the flags '`1 1`' in the 3rd and 4th columns from the end.
+The `xEl_offs` and `El_off` values (ie. the 3rd and 4th columns) are the beam
+spaces offsets of the pointing fit. The absolute value of these should be less
+that ~0.02 degrees in each coordinate. There should also be the flags '`1 1`'
+in the 3rd and 4th columns from the end.
 
 Next, measure the SEFDs on test source
 
