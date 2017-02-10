@@ -272,12 +272,12 @@ This will display the `pps_offset`, `dot`, and `gps_offset`:
     2016.320.18:11:39.29/rdbea/!dbe_gps_offset?0:-3.758203125e-05;
     2016.320.18:11:39.29/rdbec/!dbe_gps_offset?0:-3.758203125e-05;
 
-The offsets should be small (GPS typically ± a few tens of
-microseconds, PPS less than ±100 nanoseconds) and the DOT times should
-be the same the FS log timestamps, within a about 0.1 seconds.  The
-third field of 'dot' output is the VDIF epoch. All RDBEs must have the
-same value, (33 in this case).  The VDIF epochs of all RDBEs are also
-shown in the RDBE status window.
+The offsets should be small (GPS typically ± a few tens of µs, PPS
+less than ±0.1 µs) and the DOT times should be the same the FS log
+timestamps, within about 0.1 seconds.  The third field of 'dot' output
+is the VDIF epoch. All RDBEs must have the same value, (33 in this
+case).  The VDIF epochs of all RDBEs are also shown in the RDBE status
+window.
 
 > For old server, the VDIF epochs are not displayed
 
@@ -299,12 +299,12 @@ by comparing it to the FS/Computer time. If it is off by a lot, use
 use '`+`' and/or '`-`' to increment and/or decrement the RDBE by a second
 at time until it agrees with the FS time.
 
-**If the PPS offset is greater in magnitude than ±1e-7 (±100
-nanoseconds)** for an RDBE, it must be resync'd. You can try using the
-'s' command in 'fmset' for each RDBE that has too large an offset.
-This command will take approximately 45 seconds per RDBE to complete.
-If as a result, the PPS offset comes within the tolerance, please
-check that all the RDBEs are sending data with
+**If the PPS offset is greater in magnitude than ±1e-7 (±0.1 µs)** for
+an RDBE, it must be resync'd. You can try using the 's' command in
+'fmset' for each RDBE that has too large an offset.  This command will
+take approximately 45 seconds per RDBE to complete.  If as a result,
+the PPS offset comes within the tolerance, please check that all the
+RDBEs are sending data with
 
 ```fs
 mk6in
@@ -375,15 +375,8 @@ initp
 casa
 ```
 
-> This is KPGO specific:
->
-> verify Az and El for source are acceptable
->
->     antenna=operate
->
-> If not, try a different source first.
-
 The following sources are the most reliable for these small antennas:
+
 
       Source Approximate L.S.T. of transit
   ---------- -------------------------------
@@ -392,11 +385,21 @@ The following sources are the most reliable for these small antennas:
     Cygnus A             20:00
        Cas A             23:30
 
-> This following information is site specific.
+> This is KPGO specific:
 >
-> Local apparent sidereal time (L.A.S.T) is displayed in the antenna
-> monitor window (monan) at GGAO and KPGO.  Cas A is always up at GGAO and
-> Westford, but another source may be more appropriate at times.
+> verify Az and El for source are acceptable
+>
+>     antenna=operate
+>
+> If not, try a different source first.
+
+
+
+> This following information is site specific.
+
+Local apparent sidereal time (L.A.S.T) is displayed in the antenna
+monitor window (monan) at GGAO and KPGO.  Cas A is always up at GGAO and
+Westford, but another source may be more appropriate at times.
 
 Set mode and attenuators
 ------------------------
@@ -416,7 +419,7 @@ proc=point
 Check RDBEs
 -----------
 
-Locate the RDBE Monitor window (momnit6) or start it by pressing
+Locate the RDBE Monitor window (monit6) or start it by pressing
 `<Control><Shift>6`.  Noting that for some fields the display switches
 between IF0 and IF1 every second, check for each RDBE that:
 
@@ -428,16 +431,19 @@ between IF0 and IF1 every second, check for each RDBE that:
 
 3.  DOT2GPS value small (±a few µs) and stable (varies by 0.1 µs or less)
 
-4.  RMS values close to 20. They may be higher if the antenna has
+4.  DOT2PPS value small (±0.1 µs) and stable (varies by 0.004 µs or
+    less).
+
+5.  RMS values close to 20. They may be higher if the antenna has
     reached the source since the "auto" command above.  They may be
     higher or lower if the elevation has changed significantly since
     the "auto" or there is variable RFI.
 
     > For the old server, RMS values close to 32.
 
-5.  Tsys IF0 and IF1 about 50-100, may be jumping a bit
+6.  Tsys IF0 and IF1 about 50-100, may be jumping a bit
 
-6.  Phase-cal amplitude about 10-100, phase stable to within a few
+7.  Phase-cal amplitude about 10-100, phase stable to within a few
     degrees
 
 Leave the window open for later monitoring.
@@ -694,20 +700,23 @@ alternater between IF0 and IF1 every second:
 
 > For old server, not applicable.
 
-3.  DOT2GPS value small (±a few µseconds) and stable (varies by 0.1
-    µseconds or less)
+3.  DOT2GPS value small (±a few µs) and stable (varies by 0.1 µs or
+    less).
 
-4.  While *recording* RMS values are close to 20 for the new server,
+4.  DOT2PPS value small (±0.1 µs) and stable (varies by 0.004 µs or
+    less).
+
+5.  While *recording* RMS values are close to 20 for the new server,
     sometime RFI can cause the value to be off, but it should always
     be between 10 and 40 during recording.  If valeus are outside the
     nominal ragnget they will be shown in inverse video.
 
 > For the old server, RMS values close to 32 and inverse video is not used.
 
-5.  Tsys IF0 and IF1 about 50-100 (may lower at Wf due to use of a
+6.  Tsys IF0 and IF1 about 50-100 (may lower at Wf due to use of a
     preliminary cal value), may be jumping a bit
 
-6.  Phase-cal amplitude about 10-100, phase stable to within a few
+7.  Phase-cal amplitude about 10-100, phase stable to within a few
     degrees.
 
 Post experiment
