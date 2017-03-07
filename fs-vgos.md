@@ -616,6 +616,8 @@ From the FS enter:
 start_mlog
 ```
 
+> **AB:** Doesn't seem to work at Wf
+
 If there are no errors reported and the "Done" message is printed the
 logging has been started.
 
@@ -843,9 +845,9 @@ In a terminal, log in to the Mark 6
 
 ```tcsh
 ssh mark6a
-gather /mnt/disks/<slot>/*/data/<filename>.vdif –o <filename>.vdif
+gator <group> <filename>.vdif ~/
 dqa –d <filename>.vdif
-scp <filename>_*.vdif evlbi1.haystack.mit.edu:/data-st12/vgos/
+scp <filename>_*.vdif evlbi1.haystack.mit.edu:/data-st12/vgos/<exp>/
 ```
 
 > **EH:** Maybe put into a script, or something, to minimize typing?
@@ -1099,6 +1101,9 @@ Manually processing schedules
     5                        # print summary
     0                        # exit DRUDG
     ```
+
+> **AB**: Should use /exper/ directory?
+
 
 Schedule rotation
 -----------------
@@ -1384,6 +1389,25 @@ If the server is not running, start it with
 ```tcsh
 ./startmciserver
 ```
+
+> This is specific to Westford
+
+Log in to the MCI node PC from a new window on the FSPC
+
+```tcsh
+ssh 192.52.63.139
+```
+Confirm the server is running (called 'fenode_server')
+```tcsh
+ps aux |grep server
+```
+If it is not running, start as follows
+```tcsh
+cd node-software/V0/
+./mci_fenodesrvr 192.52.63.139
+```
+At this point you should see data points all the way through DI345 scroll
+ once per minute.  If you close this window, the server will quit.
 
 > This is site specific to KPGO
 
