@@ -33,11 +33,12 @@ MDFLAGS =
 		--listings \
 		--latex-engine=xelatex\
 		--latex-engine-opt '-shell-escape'\
-		-V fontsize=12pt\
+		--metadata date="$(shell date -r $< +%F)" \
 		-V subparagraph \
 		-V verbatim-in-note \
 		--number-sections \
 		$< -o $@
+		# -V fontsize=12pt\
 	#--filter pandoc-minted
 		# --latex-engine=lualatex\
 	# pandoc -V subparagraph $< -o $@

@@ -1,5 +1,4 @@
 % VGOS Operators Notes
-% January 2017
 
 Introduction
 ============
