@@ -2,7 +2,7 @@
 \usepackage{xcolor}
 \usepackage[compact]{titlesec}
 \renewcommand{\paragraph}[1]{\oldparagraph{#1} }
-\usepackage[top=0.5in, bottom=1in, left=1.0in, right=1.0in]{geometry}
+\usepackage[top=0.5in, bottom=1in, left=0.90in, right=0.90in]{geometry}
 \setlength{\columnsep}{1cm}
 % \usepackage{tgpagella}
 % \usepackage{tgtermes}
@@ -15,8 +15,20 @@
 \usepackage{setspace}
 \linespread{0.86}
 
-\setmainfont[Mapping=tex-text]{Roboto}
-\setmonofont{Roboto Mono}
+\defaultfontfeatures{Scale=MatchLowercase}
+\setmainfont[Ligatures=TeX,Scale=1.0]{Roboto}
+\setmonofont[Scale=0.85]{Roboto Mono}
+% \setmainfont[Ligatures=TeX,Numbers=OldStyle,Scale=1.0]{Source Serif Pro}
+% \setmonofont[Scale=0.85]{Source Code Pro}
+% \setmainfont[Mapping=tex-text]{Source Sans Pro Medium}
+% \setmainfont
+%   [Ligatures=TeX, % recommended
+%    UprightFont={* Light},
+%    % ItalicFont={* Italic},
+%    BoldFont={* Semibold},
+%    % BoldItalicFont={* Semibold Italic}
+%    ]{Source Serif Pro}
+% \setmonofont{Source Code Pro Light}
 \usepackage{microtype}
 
 \usepackage{tcolorbox}
