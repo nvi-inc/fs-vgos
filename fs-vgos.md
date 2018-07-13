@@ -68,7 +68,7 @@ Verify NTP is sync'd
 In the FS enter:
 
 ```fs
-ntp_check
+check_ntp
 ```
 
 The output is of the form
@@ -129,19 +129,11 @@ If the response is to not correct for any Mark6s, refer to
 Check MCI Status
 ----------------
 
-> This is specific to GGAO.
->
-> You can test whether this is needed by using the FS SNAP procedure:
->
-> 
->     dewar
-> 
+You can test whether this is needed by using the FS SNAP procedure:
 
-> This is specific to KPGO.
->
-> 
->     cryo
-> 
+ 
+    dewar
+ 
 
 If it is working, you will see the readouts for the vacuum pressure
 and 20K and 70K stages.  If not, see the [Setup MCI server] section in
