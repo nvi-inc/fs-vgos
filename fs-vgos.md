@@ -440,6 +440,7 @@ between IF0 and IF1 every second, check for each RDBE that:
 Leave the window open for later monitoring.
 
 > *EH:* Is this still needed?
+>*AB:* I would say no
 >
 > Check multicast for all 4 bands in FS shell prompt:
 > 
@@ -608,7 +609,6 @@ From the FS enter:
 start_mlog
 ```
 
-> **AB:** Doesn't seem to work at Wf
 
 If there are no errors reported and the "Done" message is printed the
 logging has been started.
@@ -673,6 +673,11 @@ far) open the 'scnch' window (`Control><Shift>K`).
 Results should show vdif, reasonable record start time, about equal
 seconds and GBs of data (typically 30+), and 8 Gbps data rate.  Be
 aware `scan_checks` *occasionally* fails and the data is okay.
+> *AB:* An occasional 'failure' in scan check typically will not have the 
+>data rate at the end, have zeroes for many fields, or very small 
+>nonsensical numbers.  This is not an indication of anything other than 
+>the flakiness of the scan_check program itself.  Many 'failures' in a row,
+>however, should be worrisome to an operator.
 
 Position and size window for convenient viewing, new output will follow
 any changed size. You can stop this with `<Control>-C`
@@ -844,6 +849,8 @@ scp <filename>_*.vdif evlbi1.haystack.mit.edu:/data-st12/vgos/<exp>/
 
 > **EH:** Maybe put into a script, or something, to minimize typing?
 > As it is, it is definitely too much typing
+>*AB:* I agree, though easy for me to say as I know nothing about bash.
+> The only variables should be scan name, group#, and server at Haystack
 
 Remove the module for shipping
 ------------------------------
@@ -1152,6 +1159,13 @@ Module conditioning
     be lit.
 
         nohup hammer.sh &
+>**AB:** Point 6.5 <the most important>.  Conditioning itself is not enough
+>to prove a disk is working or not!  It is a program that writes to every
+>part of the disk and creates a log file of the process.  This log file
+>must then be plotted to show the read/write time for the module, which 
+>should meet a certain criteria, presently undefined for VGOS-mode 8Gbps
+>recordings, and then can be erased.  Need directions here to use the
+>hammerplot.sh script and specifications for acceptable read/write times
 
 7.  To break the group, do the `mod_init` command on each module and
     reassign groups. If recording on all the modules simultaneously, no
@@ -1196,6 +1210,19 @@ Setup of RDBEs from a cold start
 ###Power up RDBEs
  
 Use the power switch to start or cycle the power of each RDBE to be started.
+>**AB:** Dave, I want to be more specific here about power cycling.  This is a 
+>Linux system, and as such should be rebooted using the command-line only.
+>UNLESS you have lost the ability to communicate with the device, in which case
+>there is no other choice than to use the switch.  Maybe should say:
+>Use the power button to start the system.  If a reboot is needed, login to the
+>system from a new shell:
+```tcsh
+ssh root@rdbe<id>
+reboot
+```
+>The system will take some time to reboot, and you will notice the front panel
+>will stop updating.  When it is fully booted the PPS and GPS lights will be
+>flashing, and the front panel will once again increment the VDIF second.
 
 > New server:
 >
@@ -1315,6 +1342,19 @@ Set-up of Mark 6 server from a cold start
 -----------------------------------------
 
 Use the power switch to start or cycle the power of each Mark 6 to be started.
+>**AB:**Again Dave, just want to be really specific about reboots.  When
+>rebooted using the power switch the modules are not cleanly unmounted, since
+>in a Mark6, unlike the Mark5, they are using a Linux file-system instead of
+>the proprietary Mark5 module hardware.  This should maybe read:
+>Use the power switch to start the Mark6.  If you need to restart the system,
+>log in as oper using a FS PC shell and reboot.
+```tcsh
+ssh oper@mark6a
+sudo reboot
+```
+>If possible, before rebooting, cleanly unmount any modules using the group=
+>commands explained earlier in this manual.  If this is not possible, ensure
+>the key is switched off before issuing the reboot command.
 
 ###Check Mark 6 connection (New server)
 
