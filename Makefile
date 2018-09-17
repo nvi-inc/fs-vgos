@@ -5,7 +5,7 @@ all: pdf html docx
 MDFLAGS = 
 
 %.docx: %.md
-	pandoc -S -o $@ $<
+	pandoc -f markdown+smart -o $@ $<
 	
 # %.pdf: %.md
 # 	pandoc \
@@ -16,7 +16,8 @@ MDFLAGS =
 #
 
 %.tex: %.md header.tex
-	pandoc -H header.tex\
+	pandoc -f markdown+smart\
+		-H header.tex\
 		--toc \
 		--toc-depth=2 \
 		--listings \
@@ -27,12 +28,13 @@ MDFLAGS =
 		$< -o $@
 
 %.pdf: %.md header.tex
-	pandoc -H header.tex\
+	pandoc -f markdown+smart \
+		-H header.tex\
 		--toc \
 		--toc-depth=2 \
 		--listings \
-		--latex-engine=xelatex\
-		--latex-engine-opt '-shell-escape'\
+		--pdf-engine=xelatex\
+		--pdf-engine-opt '-shell-escape'\
 		--metadata date="$(shell date -r $< +%F)" \
 		-V subparagraph \
 		-V verbatim-in-note \
@@ -45,7 +47,7 @@ MDFLAGS =
 	# pandoc  -H header.tex -V subparagraph -V classoption=twocolumn $< -o $@
 
 %.html: %.md
-	pandoc --toc --highlight-style monochrome -t html5 -S -c style.css $< -o $@
+	pandoc  -f markdown+smart --toc --highlight-style monochrome -t html5 -c style.css $< -o $@
 	
 %.html: %.md style.css
 	pandoc --self-contained -S -c style.css --mathjax -t slidy -o $@ $<
