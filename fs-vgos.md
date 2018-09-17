@@ -3,10 +3,10 @@
 Introduction
 ============
 
-These notes cover basic procedures for running VGOS experiment operations with
-the Field System (FS). They are described in a logical order for the tasks
-that need to be completed. If another order of operations make more sense for
-some locale that is fine of course.
+These notes cover basic procedures for running VGOS experiment
+operations with the Field System (FS). They are described in a logical
+order for the tasks that need to be completed. If another order of
+operations make more sense for some locale that is fine of course.
 
 A basic assumption is that all the equipment is already up and
 running.  The procedures check this and refer to the appendix for
@@ -14,14 +14,11 @@ set-up instructions for a device if it isn't already running.  In
 addition to these setup procedures, the appendix also contains
 instructions for some other useful operations.
 
-As written here, the procedures are mostly station independent. However, some
-station dependencies are noted. These only cover GGAO and KPGO for now but
-Westford can, and will, be added. Some of the station dependencies can be
-removed by writing some additional scripts that hid the dependencies. This is
-also a good idea because the scripts can reduce the complexity of the
-operations.
-
-> **EH:** The etransfer instructions need to be checked.
+As written here, the procedures are mostly station independent. However,
+some station specifics are noted. Some of the station specific content
+may be eventually removed by some additional scripts that hid the
+dependencies. This is also a good idea because the scripts can reduce
+the complexity of the operations.
 
 Pre-setup
 =========
@@ -42,6 +39,7 @@ the command
 ```tcsh
 fesh -d <sched>
 ```
+
 where `<sched>` is the schedule name, eg `v16033`.
 If you have manually received the schedule, follow the instructions in
 the [Manually processing schedules] section of the appendix.
@@ -102,13 +100,9 @@ From the Field System, check the RDBEs
 rdbe_status
 ```
 
-The response values should be `0x0f41`.
-
-> Old Server:
-> The response values should be `0x0941`.
-
-If the response is to not correct for any RDBEs, refer to 
-[Setup of RDBEs from a cold start] in the appendix.
+The response values should be `0x0f41`. If the response is to not
+correct for any RDBEs, refer to [Setup of RDBEs from a cold start] in
+the appendix.
 
 Check Mark 6 Status
 -------------------
@@ -180,7 +174,7 @@ commands are entered into the FS unless otherwise noted.
     mk6=mstat?1
     ```
 
-    If the module has already been initialized, ie `status1` is
+    If the module has already been initialized, i.e. `status1` is
     `initialized`, and the data is no longer needed (**be certain first**),
     erase it:
 
@@ -315,20 +309,9 @@ If this does not solve the data transmission problem. or the 's' did
 not make the offset small enough, restart the RDBE, see [Setup of
 RDBEs from a cold start] in the appendix.
 
-> For the old server if the PPS offset is too large, you will need to
-> restart the RDBE to re-sync, see [Setup of RDBEs from a cold start]
-> in the appendix.
 
 **If the displayed VDIF epochs are not the same,** use the '`;`'
 command for each RDBE to set the epoch to the nominal one.
-
-> For the old server, the only way to verify this is to note that the
-> Mark 6 will not record a test scan when you make one (but there
-> could be other causes besides this one).  If this happens and you can
-> determine which RDBEs do not have the current nominal VDIF epoch set
-> its time explicitly.  If you don't know which is wrong just set them
-> all explicitly. Use the procedure described below for after June 30
-> or December 31 to set the time(s).
 
 **If this is the first experiment since December 31 and June 30,** and
 the RDBEs have not had their epoches reset since that date, they
@@ -337,15 +320,8 @@ it to the nominal VDIF epoch. The third field in the 'dot' output
 above must be the same for all the RDBEs.  The VDIF epochs of all
 RDBEs are also shown in the RDBE status window.
 
-> For the old server, this requires setting the time explicitly for
-> each RDBE with 'fmset' even if it looks correct.  Use at least one
-> of '`.`', '`+`', '`-`', or '`=`' commands and then it is necessary to
-> verify/set the time for each RDBE. The third field of the 'dot'
-> output above will be missing for the old server and the VDIF epoch
-> will not be in the RDBE status window.
-
 If any changes were necessary due to the above considerations, check
-the values again with:
+the values again with the FS command:
 
 ```fs
 time
@@ -376,7 +352,7 @@ The following sources are the most reliable for these small antennas:
     Cygnus A             20:00
        Cas A             23:30
 
-> This is KPGO specific:
+> **KPGO:**
 >
 > verify Az and El for source are acceptable
 >
@@ -384,9 +360,6 @@ The following sources are the most reliable for these small antennas:
 >
 > If not, try a different source first.
 
-
-
-> This following information is site specific.
 
 Local apparent sidereal time (L.A.S.T) is displayed in the antenna
 monitor window (monan) at GGAO and KPGO.  Cas A is always up at GGAO and
@@ -439,14 +412,6 @@ between IF0 and IF1 every second, check for each RDBE that:
 
 Leave the window open for later monitoring.
 
-> *EH:* Is this still needed?
->*AB:* I would say no
->
-> Check multicast for all 4 bands in FS shell prompt:
-> 
->     mon<id>
->
-> where `<id>=a, b, c, or d` (eg. `mona` etc.)
 
 Check RDBE data connectons
 
@@ -512,7 +477,8 @@ Finally, zero the offsets:
 ```fs
 azeloff=0d,0d
 ```
-(note there is no space between arguments)
+
+NOTE: there is no space between arguments.
 
 Make test recording
 -------------------
@@ -593,7 +559,7 @@ Make test recording
     Results should show vdif, the time when recording was started, 30
     seconds of data, 30 GB of data with an 8 Gbps data rate.
 
-    > **EH:** data rate will eventually go to 16 and 32 Gbps.
+    (Data rate will eventually go to 16 and 32 Gbps.)
 
 Start experiment
 ================
@@ -601,17 +567,17 @@ Start experiment
 Start non-FS multi-cast logging
 -------------------------------
 
-> **EH:** Once we have InfluxDB logging of data, maybe we can get rid of this logging,
-
 From the FS enter:
 
 ```fs
 start_mlog
 ```
 
-
 If there are no errors reported and the "Done" message is printed the
 logging has been started.
+
+**NOTE:** this will eventually be replaced by the Monitoring and Archiving System (MAS).
+
 
 Send "Ready" message
 --------------------
@@ -632,8 +598,7 @@ down list.
 -   Complete the maser offset value by looking at the maser counter in
     the maser room.
 
--   In the "to" email address field, send it to
-    `ivs-vgos-ops@ivscc.gsfc.nasa.gov`
+-   In the "to" email address field, send it to `ivs-vgos-ops@lists.nasa.gov`
 
 -   Enter a brief comment, include weather information.
 
@@ -653,8 +618,8 @@ Now, in the FS, start schedule:
 schedule=<session><stn id>,#<nnn>
 ```
 
-(**Note:** the pound sign (`#`) is required and there should be no spaces
-in the command)
+**Note:** the pound sign (`#`) is required and there should be no spaces
+in the command
 
 Send "Start" message
 --------------------
@@ -673,17 +638,16 @@ far) open the 'scnch' window (`Control><Shift>K`).
 Results should show vdif, reasonable record start time, about equal
 seconds and GBs of data (typically 30+), and 8 Gbps data rate.  Be
 aware `scan_checks` *occasionally* fails and the data is okay.
-> *AB:* An occasional 'failure' in scan check typically will not have the 
->data rate at the end, have zeroes for many fields, or very small 
->nonsensical numbers.  This is not an indication of anything other than 
->the flakiness of the scan_check program itself.  Many 'failures' in a row,
->however, should be worrisome to an operator.
+An occasional 'failure' in scan check typically will not have the 
+data rate at the end, have zeroes for many fields, or very small 
+nonsensical numbers.  This is not an indication of anything other than 
+the flakiness of the scan_check program itself.  Many 'failures' in a row,
+however, should be worrisome to an operator.
 
 Position and size window for convenient viewing, new output will follow
 any changed size. You can stop this with `<Control>-C`
 
-> **EH:** The placement and size of the window can be controlled by
-> .Xresources.
+NOTE: The placement and size of the window can be controlled by the `.Xresources` file.
 
 Check RDBE Monitor
 ------------------
@@ -696,8 +660,6 @@ alternater between IF0 and IF1 every second:
 2.  VDIF epoches for all RDBEs agree, if there is any disagreement some
     will be in inverse video
 
-> For old server, not applicable.
-
 3.  DOT2GPS value small (±a few µs) and stable (varies by 0.1 µs or
     less).
 
@@ -708,8 +670,6 @@ alternater between IF0 and IF1 every second:
     sometime RFI can cause the value to be off, but it should always
     be between 10 and 40 during recording.  If valeus are outside the
     nominal ragnget they will be shown in inverse video.
-
-> For the old server, RMS values close to 32 and inverse video is not used.
 
 6.  Tsys IF0 and IF1 about 50-100 (may lower at Wf due to use of a
     preliminary cal value), may be jumping a bit
@@ -755,7 +715,7 @@ re-initialize the pointing set-up
 initp
 ```
 
-> Site Specific for KPGO:
+> **KPGO:**
 >
 >    antenna=off  (to allow verification of Az and El for source before antenna moves)
 
@@ -765,7 +725,7 @@ Try Cas-A as a source:
 casa
 ```
 
-> Site Specific for KPGO:
+> **KPGO:**
 >
 > If necessary, try other sources from table in [Initialize pointing]
 > until one with a good position is found, then:
@@ -812,7 +772,7 @@ Finally, zero the offsets
 azeloff=0d,0d
 ```
 
-> Site specific for KPGO:
+> **KPGO:**
 >
 > source=stow
 > (wait until stow is reached)
@@ -828,11 +788,7 @@ on-site.
 Send test scan data files
 -------------------------
 
-> **Chris**: This section is completely different for KPGO, due to our
-e-transfer Mk6 being a different unit than our operational Mk6. Also for
-actually sending entire experiments not just test scans. Below the
-original steps provided in this procedure are the KPGO site specific
-steps highlighted.
+> For KPGO, this step is skipped as e-transfers are done using a separate dedicated Mark 6. 
 
 In a terminal, log in to the Mark 6
 
@@ -849,11 +805,44 @@ scp <filename>_*.vdif evlbi1.haystack.mit.edu:/data-st12/vgos/<exp>/
 
 > **EH:** Maybe put into a script, or something, to minimize typing?
 > As it is, it is definitely too much typing
->*AB:* I agree, though easy for me to say as I know nothing about bash.
+> **AB:** I agree, though easy for me to say as I know nothing about bash.
 > The only variables should be scan name, group#, and server at Haystack
+
+Transfer log file
+-----------------
+
+In FS, close experiment log:
+
+```fs
+log=station
+```
+
+In a terminal, copy the log to CDDIS and Haystack with `plog`.
+If you are transferring the most recent log you can use
+
+```bash
+plog -l
+```
+
+Otherwise use
+
+```bash
+plog <session> # v16033
+```
+
+Or if the log file does not conform to the standard naming convention
+
+```bash
+plog <log file path> # eg: plog /usr2/log/v16033gs.log
+```
+
+If this is not successful, see [Manually uploading log files] in the appendix
 
 Remove the module for shipping
 ------------------------------
+
+Close and unmount disk module(s) and prepare for e-transferring a scan
+or experiment.
 
 In the FS
 
@@ -864,27 +853,22 @@ mk6=group=unmount:<slots>
 
 Before removing, check the modules are unmounted with
 
-> key off disk before doing `mk6=mstat?all`
+```fs
+mk6=mstat?all
+```
+
+Once all show unmounted, turn keys off, remove module(s).
+
+To clear module info in the Field System, again run:
 
 ```fs
 mk6=mstat?all
 ```
 
-> **Chris**: KPGO site specific send test scan and e-transfer procedure
+E-transfer module (KPGO)
+------------------------
 
-Close and unmount disk module(s) and prepare for e-transferring a scan
-or experiment.
-
-    mk6=group=close:<slots>
-    mk6=group=unmount:<slots>
-
-turn keys off, remove module(s)
-
-    mk6=mstat?all
-
-(to clear module info and check the modules are unmounted)
-
-Insert Mark6 modules into the e-tranfer Mark6
+Insert Mark6 modules into the e-transfer Mark6
 
 From the da-client mount the modules and verify all disks are seen:
 
@@ -921,8 +905,10 @@ At another xterm window (in "oper", not "root")
 
 Ssh to Haystack storage nodes:
 
-    ssh evlbi1.haystack.mit.edu  (password is oper password)
-    cd /data-st12/vgos
+```bash
+ssh evlbi1.haystack.mit.edu  #(password is oper password)
+cd /data-st12/vgos
+```
 
 Run tsunami, setting the transfer rate, error free, and connecting back
 to your machine
@@ -957,37 +943,6 @@ turn keys off, remove modules
 
 (clears module info and checks the modules are unmounted)
 
-Transfer log file
------------------
-
-> This may be done before transferring the test scan.
-
-In FS, close experiment log:
-
-```fs
-log=station
-```
-
-In a terminal, copy the log to CDDIS and Haystack with `plog`.
-If you are transferring the most recent log you can use
-
-```tcsh
-plog -l
-```
-
-Otherwise use
-
-```tcsh
-plot <session> # v16033
-```
-
-Or if the log file does not conform to the standard naming convention
-
-```tcsh
-plog <log file path> # eg /usr2/log/v16033gs.log
-```
-
-If this is not successful, see [Manually uploading log files] in the appendix
 
 Appendix
 ========
@@ -1045,35 +1000,32 @@ session to use it without a password.
 Setting Up Password-less Log Transfers
 --------------------------------------
 
-> *EH:* replace with new CDDIS transfer set-up procedure, use URL reference
+To store your password for log files transfer to CDDIS, add the following line to the `~/.netrc` file:
 
-Currently we are using FTP to transfer log files to CDDIS.
-This is will change in the future. For now, add
-the following line to the `~/.netrc` file:
-
-    machine cddisin.gsfc.nasa.gov login <username> password <password>
+    machine urs.earthdata.nasa.gov login <username> password <password>
 
 replacing the appropriate fields with your username and password.
+
+This is required for plog to operate correctly.
 
 Manually uploading log files
 ----------------------------
 
-> *EH*: must be re-written for new CDDIS procedure
+In general, plog should take care of this for you. However, the following manual procedures are here for completeness:
 
-In a terminal, copy the log to CDDIS
+### CDDIS
 
-```tcsh
-cd /usr2/log
-ftp cddisin.gsfc.nasa.gov
-user <your cddisin username>
-password <your cddisin password>
-put <session><stn id>.log      # eg 'v16033gs'
-quit
-```
+log into CDDIS:
 
-And to Haystack:
+    curl -c $HOME/.urs_cookies -n -L https://depot.cddis.eosdis.nasa.gov/CDDIS_FileUpload/login
 
-    scp <session><stn id>.log evlbi1.haystack.mit.edu:/data-st12/vgos/logs
+Upload the file:
+
+    curl -X POST -b $HOME/.urs_cookies -F "fileType=VLBI"  -F "file[]=@<log file path>" https://depot.cddis.eosdis.nasa.gov/CDDIS_FileUpload/upload/
+
+### Haystack:
+
+    scp <log file path> evlbi1.haystack.mit.edu:/data-st12/vgos/logs
 
 Manually processing schedules
 -----------------------------
@@ -1159,6 +1111,7 @@ Module conditioning
     be lit.
 
         nohup hammer.sh &
+
 >**AB:** Point 6.5 <the most important>.  Conditioning itself is not enough
 >to prove a disk is working or not!  It is a program that writes to every
 >part of the disk and creates a log file of the process.  This log file
@@ -1207,34 +1160,27 @@ fs
 Setup of RDBEs from a cold start
 --------------------------------
 
-###Power up RDBEs
+### Power up RDBEs
  
-Use the power switch to start or cycle the power of each RDBE to be started.
->**AB:** Dave, I want to be more specific here about power cycling.  This is a 
->Linux system, and as such should be rebooted using the command-line only.
->UNLESS you have lost the ability to communicate with the device, in which case
->there is no other choice than to use the switch.  Maybe should say:
->Use the power button to start the system.  If a reboot is needed, login to the
->system from a new shell:
-```tcsh
-ssh root@rdbe<id>
-reboot
+Use the power button to start the system.  If a reboot is needed, login to the
+system from a new shell:
+
+    ssh root@rdbe<id>
+    reboot
+
+The system will take some time to reboot, and you will notice the front panel
+will stop updating.  When it is fully booted the PPS and GPS lights will be
+flashing, and the front panel will once again increment the VDIF second.
+
+Check the status of all RDBEs with the FS command
+
+```fs
+rdbe_status
 ```
->The system will take some time to reboot, and you will notice the front panel
->will stop updating.  When it is fully booted the PPS and GPS lights will be
->flashing, and the front panel will once again increment the VDIF second.
 
-> New server:
->
-> Check the status of all RDBEs with the FS command
->
-> ```fs
-> rdbe_status
-> ```
->
-> When the RDBEs respond with a status value `0x0f41`, skip to [Check/Set RDBE times]
+When the RDBEs respond with a status value `0x0f41`, skip to [Check/Set RDBE times]
 
-###Start RDBE server
+### Start RDBE server
 
 
 From FS PC shell prompt, login to each RDBE:
@@ -1263,7 +1209,7 @@ rdbe_status
 There will be an error for each RDBE that is not ready. When all RDBEs
 respond with a status value `0x0941`, proceed to the next step.
 
-###Load Firmware
+### Load Firmware
 
 To load the firmware on all RDBEs, use the FS command:
 
@@ -1287,13 +1233,11 @@ with again using
 ```fs
 rdbe_status
 ```
-This time, the RDBEs should respond with status `0x0f01`
-
-> **EH:** is 0x0f01 correct?
+This time, the RDBEs should respond with status `0x0f41`.
 
 When all status values reach the correct value, proceed to next step
 
-###Configure RDBEs
+### Configure RDBEs
 
 To initialize the configuration on all RDBEs, use the FS command:
 
@@ -1311,7 +1255,7 @@ rdbe_init<id>
 
 You should get a "success" message.
 
-###Check/Set RDBE times
+### Check/Set RDBE times
 
 It is **necessary** to check/set the time with `fmset` for an RDBE
 **every time** it is restarted.  The time only needs to be set if it is
@@ -1341,26 +1285,23 @@ Be sure to exit with `<Escape>`.
 Set-up of Mark 6 server from a cold start
 -----------------------------------------
 
-Use the power switch to start or cycle the power of each Mark 6 to be started.
->**AB:**Again Dave, just want to be really specific about reboots.  When
->rebooted using the power switch the modules are not cleanly unmounted, since
->in a Mark6, unlike the Mark5, they are using a Linux file-system instead of
->the proprietary Mark5 module hardware.  This should maybe read:
->Use the power switch to start the Mark6.  If you need to restart the system,
->log in as oper using a FS PC shell and reboot.
+Use the power switch to start the Mark6.  If you need to restart the system,
+log in as oper using a FS PC shell and reboot.
+
 ```tcsh
 ssh oper@mark6a
 sudo reboot
 ```
->If possible, before rebooting, cleanly unmount any modules using the group=
->commands explained earlier in this manual.  If this is not possible, ensure
->the key is switched off before issuing the reboot command.
 
-###Check Mark 6 connection (New server)
+If possible, before rebooting, cleanly unmount any modules using the group=
+commands explained earlier in this manual.  If this is not possible, ensure
+the key is switched off before issuing the reboot command.
+
+### Check Mark 6 connection
 
 From the Field System, check the Mark 6 connection
 
-``` {.fs}
+```fs
 mk6=dts_id?
 ```
 
@@ -1370,7 +1311,7 @@ You should receive a sensible response similar to
 
 If so, you can skip the rest of this section.
 
-###Starting Mark 6 servers
+### Starting Mark 6 servers
 
 If you receive an error, check that the Mark 6 servers are running. The
 programs `cplane` and `dplane` need to be running on the Mark 6. These
@@ -1393,88 +1334,63 @@ If they are not, start them
 Setup MCI server
 ----------------
 
->This is specific to GGAO.
->
-> GGAO should be set-up agree with KPGO FS approach below.
-
 You can test whether this is needed by using the FS SNAP procedure:
 
 ```fs
 dewar
 ```
 
-If it is working, you will see the readouts for the 20K and 70K stages.
-If not, or if more MCI parameters are desired, use the following from a
-shell window, login to the MCI computer and run the MCI client
-
-```tcsh
-ssh mci
-./tcpip_client mci 10000
-```
-
-a prompt should come up. To display all the MCI data use the command
-
-    mci_data?
-
-If the server is not running, start it with
-
-```tcsh
-./startmciserver
-```
-
-> This is specific to Westford
-
-Log in to the MCI node PC from a new window on the FSPC
-
-```tcsh
-ssh 192.52.63.139
-```
-Confirm the server is running (called 'fenode_server')
-```tcsh
-ps aux |grep server
-```
-If it is not running, start as follows
-```tcsh
-cd node-software/V0/
-./mci_fenodesrvr 192.52.63.139
-```
-At this point you should see data points all the way through DI345 scroll
- once per minute.  If you close this window, the server will quit.
-
-> This is site specific to KPGO
-
-You can test whether this is needed by using the FS SNAP procedure:
-
-This is specific to KPGO.
-
-```fs
- cryo
-```
 
 If it is working, you will see the readouts for the vacuum, 20K, and
-70K stages.  If not, start the server from the FS:
+70K stages.  If not, start the server from the FS with:
 
 ```fs
 startmci
 ```
 
-If 'cryo' still doesn't work, then use log into the Hub PC in new xterm window of FS
+> **For Westford** to restart the server:
+> 
+> Log in to the MCI node PC from a new window on the FSPC
+>
+> ```tcsh
+> ssh 192.52.63.139
+> ```
+>
+> Confirm the server is running (called 'fenode_server')
+> ```tcsh
+> ps aux |grep server
+> ```
+>
+> If it is not running, start as follows
+> ```tcsh
+> cd node-software/V0/
+> ./mci_fenodesrvr 192.52.63.139
+> ```
+> At this point you should see data points all the way through DI345 scroll
+> once per minute.  If you close this window, the server will quit.
 
-     ssh oper@hubpc
-     ps aux|grep mci (to see if mci server is running)
-     startmciserver (to start the server if not running)
 
-To display more MCI date from the FS, enter:
-
-```fs
-mci_data
-```
-
-If that doesn't work, log into the Backend PC in new xterm window on FS
-
-    ssh oper@backend-pc
-    mci_client.py 128.171.102.237 5000 (opens mci client on backend pc)
-    mci_data? (displays all mci data points current state including dewar temperatures)
+> **For KPGO** to restart the server:
+> 
+>```bash
+>ssh oper@hubpc
+>ps aux|grep mci #(to see if mci server is running)
+>startmciserver  #(to start the server if not running)
+>```
+>
+>To display more MCI data from the FS, enter:
+>
+>```fs
+>mci_data
+>```
+>
+>If that doesn't work, log into the Backend PC in new xterm window on FS
+>
+>```bash
+>ssh oper@backend-pc
+>mci_client.py 128.171.102.237 5000 #(opens mci client on backend pc)
+>mci_data?  #(displays all mci data points current state including dewar temperatures)
+>```
 
 Connecting RDBE IF inputs
 -------------------------
@@ -1491,8 +1407,8 @@ rdbe_attenX=<if>,31.5
 
 where:
 
-   '`X`' is the RDBE '`a`', '`b`', '`c`', '`d`' or null for all.
-   '`<if>`' is the IF channel '`0`', '`1`', or '`both`' (or null) for both
+-  '`X`' is the RDBE '`a`', '`b`', '`c`', '`d`' or null for all.
+-  '`<if>`' is the IF channel '`0`', '`1`', or '`both`' (or null) for both
 
 for example to set IF1 attenuator for RDBE-B to the maximum use:
 
