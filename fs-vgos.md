@@ -1350,7 +1350,7 @@ startmci
 
 > **For Westford** to restart the server:
 > 
-> Log in to the MCI node PC from a new window on the FSPC
+> Log in to the MCI node PC from a new window on the FS PC
 >
 > ```tcsh
 > ssh 192.52.63.139
@@ -1369,28 +1369,6 @@ startmci
 > At this point you should see data points all the way through DI345 scroll
 > once per minute.  If you close this window, the server will quit.
 
-
-> **For KPGO** to restart the server:
-> 
->```bash
->ssh oper@hubpc
->ps aux|grep mci #(to see if mci server is running)
->startmciserver  #(to start the server if not running)
->```
->
->To display more MCI data from the FS, enter:
->
->```fs
->mci_data
->```
->
->If that doesn't work, log into the Backend PC in new xterm window on FS
->
->```bash
->ssh oper@backend-pc
->mci_client.py 128.171.102.237 5000 #(opens mci client on backend pc)
->mci_data?  #(displays all mci data points current state including dewar temperatures)
->```
 
 Connecting RDBE IF inputs
 -------------------------
