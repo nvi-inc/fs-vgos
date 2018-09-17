@@ -264,8 +264,6 @@ is the VDIF epoch. All RDBEs must have the same value, (33 in this
 case).  The VDIF epochs of all RDBEs are also shown in the RDBE status
 window.
 
-> For old server, the VDIF epochs are not displayed
-
 **If any of the DOT times are not correct**, the ones that are wrong must
 be set with 'fmset'. To do this from the FS console, press
 `<Control><Shift>T` to start `fmset`, or type
@@ -391,8 +389,6 @@ between IF0 and IF1 every second, check for each RDBE that:
 
 2.  All RDBEs have the same epoch
 
-    > Not applicable to old server
-
 3.  DOT2GPS value small (±a few µs) and stable (varies by 0.1 µs or less)
 
 4.  DOT2PPS value small (±0.1 µs) and stable (varies by 0.004 µs or
@@ -402,8 +398,6 @@ between IF0 and IF1 every second, check for each RDBE that:
     reached the source since the "auto" command above.  They may be
     higher or lower if the elevation has changed significantly since
     the "auto" or there is variable RFI.
-
-    > For the old server, RMS values close to 32.
 
 6.  Tsys IF0 and IF1 about 50-100, may be jumping a bit
 
