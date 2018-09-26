@@ -1161,6 +1161,7 @@ Setup Field System PC from Cold start
 Setup of RDBEs from a cold start
 --------------------------------
 
+
 ### Power up RDBEs
  
 Use the power button to start the system.  If a reboot is needed, login to the
@@ -1170,8 +1171,8 @@ system from a new shell:
     reboot
 
 The system will take some time to reboot, and you will notice the front panel
-will stop updating.  When it is fully booted the PPS and GPS lights will be
-flashing, and the front panel will once again increment the VDIF second.
+will stop updating, though it will not go dark.  When it is fully booted the PPS and GPS
+lights will be flashing, and the front panel will once again increment the VDIF second.
 
 Check the status of all RDBEs with the FS command
 
@@ -1294,7 +1295,7 @@ ssh oper@mark6a
 sudo reboot
 ```
 
-If possible, before rebooting, cleanly unmount any modules using the group=
+If possible, before rebooting, cleanly unmount any modules using the `group=`
 commands explained earlier in this manual.  If this is not possible, ensure
 the key is switched off before issuing the reboot command.
 
