@@ -954,7 +954,7 @@ Accept the defaults and enter a blank password when prompted.
 
 For each computer you want to enable password-less login, append your public
 key to `.ssh/authorized_keys` on the remote host. On a recent versions of the
-Field System OS (i.e., FSL9 based on Debian Wheezy) use the command (use the target host node name or IP address in place of $host):
+Field System OS (i.e., FSL9 based on Debian Wheezy) use the command (use the target host node name or IP address in place of `$host`):
 
     ssh-copy-id $host
 
@@ -1072,6 +1072,9 @@ Schedule rotation
 
 Module conditioning
 -------------------
+
+TIP: For a more complete overview of module conditioning,
+see Chet Ruszczyk's "Mark6 Disk Module Conditioning"
 
 1.  Load modules and enter da-client
 
