@@ -1329,11 +1329,18 @@ ssh root@mark6a
 ps aux | grep plane
 ```
 
-If they are not, start them
+If they are not, you can start them as _root_ with either (older
+systems):
 
 ```tcsh
 /etc/init.d/dplane start
 /etc/init.d/cplane start
+```
+or (newer systems):
+
+```tcsh
+systemctl start dplane
+systemctl start cplane
 ```
 
 Setup MCI server
